@@ -7,7 +7,7 @@ Type=simple
 User=pi
 Group=pi
 WorkingDirectory=/home/pi/traeger-grill-monitor
-ExecStart=/usr/bin/python3 /home/pi/traeger-grill-monitor/run_preview.py
+ExecStart=/home/pi/.local/bin/gunicorn --bind 0.0.0.0:8081 --workers 1 --threads 4 --timeout 30 app:app
 Restart=on-failure
 RestartSec=5
 
