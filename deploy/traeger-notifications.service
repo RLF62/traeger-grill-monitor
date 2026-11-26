@@ -1,0 +1,16 @@
+[Unit]
+Description=Traeger Grill Monitor notification worker
+After=network-online.target traeger-collector.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/traeger-grill-monitor
+ExecStart=/usr/bin/python3 /home/pi/traeger-grill-monitor/notification_worker.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
