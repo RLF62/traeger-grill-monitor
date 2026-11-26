@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>Traeger Grill Monitor</strong><small>Rebuild preview</small></div></header>
+<header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>Traeger Grill Monitor</strong><small>Alerts and Pushover</small></div></header>
 <main>
   <nav><a href="{{ url_for('index') }}">Dashboard</a><a href="{{ url_for('cooks') }}">Cook Presets</a><a href="{{ url_for('settings') }}">Settings</a><a href="{{ url_for('notifications') }}" aria-current="page">Notifications</a></nav>
   <section class="card">
