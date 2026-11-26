@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications · Traeger Grill Monitor</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>Traeger Grill Monitor</strong><small>Rebuild preview</small></div></header>
+<main>
+  <nav><a href="{{ url_for('index') }}">Dashboard</a><a href="{{ url_for('cooks') }}">Cook Presets</a><a href="{{ url_for('settings') }}">Settings</a><a href="{{ url_for('notifications') }}" aria-current="page">Notifications</a></nav>
+  <section class="card">
+    <h1>Notification Settings</h1>
+    {% if result == 'saved' %}<p class="banner good">Pushover keys saved.</p>{% endif %}
+    {% if result == 'sent' %}<p class="banner good">Pushover accepted the test. Confirm it arrived on your phone.</p>{% endif %}
+    {% if result == 'failed' %}<p class="banner bad">Test failed. Check the Pushover keys and application log.</p>{% endif %}
+    {% if result == 'invalid' %}<p class="banner bad">Enter valid Pushover keys (30 letters or numbers each).</p>{% endif %}
+    {% if result == 'alerts_saved' %}<p class="banner good">Alert settings saved.</p>{% endif %}
+    {% if result == 'invalid_alerts' %}<p class="banner bad">Check the threshold ranges below.</p>{% endif %}
+    {% if result == 'missing' %}<p class="banner bad">Set up Pushover before sending a test.</p>{% endif %}
+    <p class="note">{{ 'Pushover is configured. Saved keys are never shown.' if configured else 'Pushover has not been set up for this monitor. Add your Traeger application token and user key below.' }}</p>
+    {% if secure_form %}
+      {% if not configured %}<button id="setup-button" type="button" aria-controls="setup-form" aria-expanded="false">Set Up Pushover</button>{% endif %}
+      <form id="setup-form" method="post" {% if not configured and result != 'invalid' %}hidden{% endif %}>
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <p class="note">Create a separate Traeger application on <a href="https://pushover.net/" rel="noopener noreferrer" target="_blank">Pushover</a>. The User Key is on your Pushover dashboard.</p>
+        <label for="token">Application API Token</label>
+        <input id="token" name="pushover_app_token" type="password" autocomplete="new-password" placeholder="{{ 'Leave blank to keep saved token' if configured else 'Traeger application token' }}">
+        <label for="user-key">Pushover User Key</label>
+        <input id="user-key" name="pushover_user_key" type="password" autocomplete="new-password" placeholder="{{ 'Leave blank to keep saved key' if configured else 'Your user key' }}">
+        <button type="submit" name="action" value="save">Save</button>
+      </form>
+    {% else %}
+      <p class="banner bad">Open this page from the home LAN to set up Pushover.</p>
+      {% if not configured %}<button type="button" disabled>Set Up Pushover</button>{% endif %}
+    {% endif %}
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button type="submit" name="action" value="test" {% if not configured %}disabled{% endif %}>Send Test Notification</button>
+    </form>
+  </section>
+  <section class="card history">
+    <h2>Cooking alerts</h2>
+    <p class="note">Alerts follow new temperature readings. They are off until you enable them here. The original app's alerts run separately.</p>
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label class="check"><input type="checkbox" name="enabled" {% if settings.enabled %}checked{% endif %} {% if not configured or not secure_form %}disabled{% endif %}> Enable automatic Pushover alerts</label>
+      <div class="option-grid">
+        {% for key, title in [('grill_reached','Grill target reached'),('probe1_reached','Probe 1 target reached'),('probe2_reached','Probe 2 target reached'),('grill_deviation','Grill too high / low and recovered'),('pellet_low','Low pellets'),('pi_hot','Pi temperature high')] %}
+        <label class="check"><input type="checkbox" name="{{ key }}" {% if settings[key] %}checked{% endif %} {% if not secure_form %}disabled{% endif %}> {{ title }}</label>
+        {% endfor %}
+      </div>
+      <div class="threshold-grid">
+        <label>Low pellets at or below (%)<input name="pellet_threshold" type="number" min="5" max="50" value="{{ settings.pellet_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
+        <label>Pi temperature high (°F)<input name="pi_threshold" type="number" min="120" max="220" value="{{ settings.pi_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
+        <label>Grill deviation (%)<input name="deviation_percent" type="number" min="5" max="40" value="{{ settings.deviation_percent }}" {% if not secure_form %}disabled{% endif %}></label>
+      </div>
+      <button name="action" value="save_alerts" {% if not secure_form %}disabled{% endif %}>Save alert settings</button>
+    </form>
+    <p class="note">The new worker sends alerts when a reading crosses a threshold. It does not replay old readings when started.</p>
+  </section>
+</main>
+<script src="{{ url_for('static', filename='notifications.js') }}" defer></script>
+</body></html>
