@@ -1,0 +1,15 @@
+[Unit]
+Description=Traeger Grill Monitor sensor collector
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/traeger-grill-monitor
+ExecStart=/usr/bin/python3 /home/pi/traeger-grill-monitor/collector.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
