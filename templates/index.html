@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Traeger Grill Monitor · Preview</title>
+  <title>Traeger Grill Monitor</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header><span class="brand-icon"><span class="smoke" aria-hidden="true"><i></i><i></i><i></i></span><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""></span><div><strong>Traeger Grill Monitor</strong><small>Live preview</small></div></header>
+<header><span class="brand-icon"><span class="smoke" aria-hidden="true"><i></i><i></i><i></i></span><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""></span><div><strong>Traeger Grill Monitor</strong><small>Live monitor</small></div></header>
 <main>
   <nav><a href="{{ url_for('index') }}" aria-current="page">Dashboard</a><a href="{{ url_for('cooks') }}">Cook Presets</a><a href="{{ url_for('settings') }}">Settings</a><a href="{{ url_for('notifications') }}">Notifications</a></nav>
   <section class="card cook-status"><div class="section-title"><div><p class="eyebrow">NOW COOKING</p><h2 id="cook-name">Checking active cook…</h2></div><a class="small-link" href="{{ url_for('cooks') }}">Choose a cook</a></div><p id="cook-targets" class="note"></p></section>
