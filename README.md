@@ -11,7 +11,7 @@ The working installation is `/home/pi/traeger-grill-monitor` at `http://192.168.
 - Click an individual gauge ring to choose its color; the matching chart line follows it. Click the pellet hopper bar to choose the pellet line color.
 - Click a legend item to hide or show a chart trace. Hover or tap near a line to see the time and value.
 - Cook Presets lets you add, edit, delete, and activate saved targets. Activating a cook starts a fresh chart session without deleting older readings. The active cook appears on the dashboard.
-- Settings sets the sensor sample interval (10–300 seconds, default 60) and dashboard refresh interval (2–60 seconds, default 15). The collector uses a changed interval after its current sleep finishes. A faster refresh cannot create additional sensor samples.
+- Settings can show or hide 10°F gauge marks with longer marks every 50°F. It sets the sensor sample interval (10–300 seconds, default 60) and dashboard refresh interval (2–60 seconds, default 15). The collector uses a changed interval after its current sleep finishes. A faster refresh cannot create additional sensor samples.
 - Notifications can store Pushover keys and enable individual alerts. Keys, alert state, history, and cook data remain local and are ignored by Git.
 
 ## Install on matching Raspberry Pi hardware
