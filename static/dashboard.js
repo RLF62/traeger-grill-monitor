@@ -2,6 +2,8 @@
 const $ = id => document.getElementById(id);
 let previousSample = '';
 let previousCook = '';
+let previousTicks = null;
+let showGaugeTicks = false;
 let currentHistory = [];
 let refreshMs = 15000;
 const colors = {grill:'#ffad48', probe1:'#69c9c0', probe2:'#9da8ff', pellets:'#a4dc74'};
@@ -31,13 +33,29 @@ const fmt = value => value === null || value === undefined || !Number.isFinite(v
 function targetMarker(dial, target, max) {
   const svg = dial.querySelector('.target-overlay');
   svg.replaceChildren();
-  if (typeof target !== 'number' || target <= 0 || target > max) return;
   const ns = 'http://www.w3.org/2000/svg';
+  if (!showGaugeTicks && (typeof target !== 'number' || target <= 0 || target > max)) return;
   const angle = -135 + (target / max) * 270;
   const point = (radius, degrees) => {
     const radians = degrees * Math.PI / 180;
     return [100 + radius * Math.sin(radians), 100 - radius * Math.cos(radians)];
   };
+  if (showGaugeTicks) {
+    for (let value = 0; value <= max; value += 10) {
+      const degrees = -135 + (value / max) * 270;
+      const major = value % 50 === 0;
+      const inner = point(major ? 80 : 85, degrees);
+      const outer = point(major ? 95 : 92, degrees);
+      const tick = document.createElementNS(ns, 'line');
+      tick.setAttribute('x1', inner[0].toFixed(1));
+      tick.setAttribute('y1', inner[1].toFixed(1));
+      tick.setAttribute('x2', outer[0].toFixed(1));
+      tick.setAttribute('y2', outer[1].toFixed(1));
+      tick.setAttribute('class', major ? 'gauge-tick major' : 'gauge-tick');
+      svg.appendChild(tick);
+    }
+  }
+  if (typeof target !== 'number' || target <= 0 || target > max) return;
   const start = Math.max(-135, angle - 4);
   const end = Math.min(135, angle + 4);
   const innerStart = point(82, start), outerStart = point(99, start);
@@ -163,7 +181,9 @@ async function refresh() {
     const r = data.latest;
     $('sample-time').textContent = 'Last sample: ' + new Date(r.time).toLocaleString();
     const cookSignature = (cook ? [cook.name,cook.grill,cook.probe1,cook.probe2].join('|') : '') + '|' + (data.session_start || '');
-    if (r.time === previousSample && cookSignature === previousCook) return;
+    showGaugeTicks = data.gauge_ticks === true;
+    if (r.time === previousSample && cookSignature === previousCook && showGaugeTicks === previousTicks) return;
+    previousTicks = showGaugeTicks;
     previousSample = r.time;
     previousCook = cookSignature;
     for (const name of ['grill','probe1','probe2']) updateDial(name, r[name], cook ? cook[name] : null);
