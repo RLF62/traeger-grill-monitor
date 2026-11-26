@@ -215,7 +215,8 @@ def api_readings():
     stale = not latest or datetime.now() - datetime.fromisoformat(latest["time"]) > timedelta(minutes=3)
     return jsonify({"latest": latest, "history": history, "stale": stale, "wifi_name": wifi_name(),
                     "active_cook": active, "session_start": cook_session["started_at"] if cook_session else None,
-                    "refresh_seconds": update_settings.load()["refresh_seconds"]})
+                    "refresh_seconds": update_settings.load()["refresh_seconds"],
+                    "gauge_ticks": update_settings.load()["gauge_ticks"]})
 
 
 @app.route("/")
@@ -231,7 +232,8 @@ def settings():
             abort(403)
         try:
             update_settings.save(request.form.get("sample_seconds", ""),
-                                 request.form.get("refresh_seconds", ""))
+                                 request.form.get("refresh_seconds", ""),
+                                 request.form.get("gauge_ticks") == "on")
             return redirect(url_for("settings", result="saved"))
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
