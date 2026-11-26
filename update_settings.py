@@ -5,27 +5,29 @@ import tempfile
 from pathlib import Path
 
 CONFIG = Path(__file__).resolve().parent / "private" / "update-settings.json"
-DEFAULT = {"sample_seconds": 60, "refresh_seconds": 15}
+DEFAULT = {"sample_seconds": 60, "refresh_seconds": 15, "gauge_ticks": False}
 
 
 def load():
     try:
         data = json.loads(CONFIG.read_text())
         result = dict(DEFAULT, **data) if isinstance(data, dict) else dict(DEFAULT)
-        return validate(result["sample_seconds"], result["refresh_seconds"])
+        return validate(result["sample_seconds"], result["refresh_seconds"], result["gauge_ticks"])
     except (OSError, ValueError, TypeError, KeyError):
         return dict(DEFAULT)
 
 
-def validate(sample, refresh):
+def validate(sample, refresh, gauge_ticks=False):
+    if not isinstance(gauge_ticks, bool):
+        raise ValueError("Gauge tick setting must be on or off.")
     sample, refresh = int(sample), int(refresh)
     if not 10 <= sample <= 300 or not 2 <= refresh <= 60:
         raise ValueError("Sample interval must be 10–300 seconds and dashboard interval 2–60 seconds.")
-    return {"sample_seconds": sample, "refresh_seconds": refresh}
+    return {"sample_seconds": sample, "refresh_seconds": refresh, "gauge_ticks": gauge_ticks}
 
 
-def save(sample, refresh):
-    data = validate(sample, refresh)
+def save(sample, refresh, gauge_ticks=False):
+    data = validate(sample, refresh, gauge_ticks)
     fd, temp = tempfile.mkstemp(prefix=".update-", dir=str(CONFIG.parent))
     try:
         os.fchmod(fd, 0o600)
