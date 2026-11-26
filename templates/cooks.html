@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cook Presets · Traeger Grill Monitor</title>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>Traeger Grill Monitor</strong><small>Saved cooks</small></div></header>
+<main>
+<nav><a href="{{ url_for('index') }}">Dashboard</a><a href="{{ url_for('cooks') }}" aria-current="page">Cook Presets</a><a href="{{ url_for('settings') }}">Settings</a><a href="{{ url_for('notifications') }}">Notifications</a></nav>
+<section class="card">
+  <p class="eyebrow">COOK PRESETS</p><h1>Choose what’s cooking</h1>
+  <p class="note">Save your grill and probe temperatures once. Activate a cook to use its targets in both dashboards.</p>
+  {% if result == 'saved' %}<p class="banner good" role="status">Cook presets updated.</p>{% endif %}
+  {% if result == 'error' %}<p class="banner bad" role="alert">{{ reason }}</p>{% endif %}
+  {% if active %}<p class="active-summary">Now cooking: <strong>{{ active.name }}</strong> · Grill {{ active.grill }}°F{% if active.probe1 %} · Probe 1 {{ active.probe1 }}°F{% endif %}{% if active.probe2 %} · Probe 2 {{ active.probe2 }}°F{% endif %}</p>{% endif %}
+  <div class="preset-list">
+  {% for row in rows %}
+    <article class="preset {% if row.active %}selected{% endif %}">
+      <div class="preset-main">
+        <div><strong>{{ row.name }}</strong><p>Grill {{ row.grill }}°F{% if row.probe1 %} · Probe 1 {{ row.probe1 }}°F{% endif %}{% if row.probe2 %} · Probe 2 {{ row.probe2 }}°F{% endif %}</p></div>
+        {% if row.active %}
+          <div class="active-actions"><span class="active-pill">Active</span><form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="index" value="{{ row.index }}"><button class="secondary" name="action" value="activate">Restart cook &amp; chart</button></form></div>
+        {% else %}
+          <form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="index" value="{{ row.index }}"><button name="action" value="activate">Start this cook</button></form>
+        {% endif %}
+      </div>
+      <details><summary>Edit preset</summary>
+        <form method="post" class="preset-form">
+          <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="index" value="{{ row.index }}">
+          <label>Cook name<input name="name" maxlength="60" required value="{{ row.name }}"></label>
+          <div class="preset-fields"><label>Grill target °F<input name="grill" type="number" min="50" max="500" required value="{{ row.grill }}"></label><label>Probe 1 target °F<input name="probe1" type="number" min="50" max="500" value="{{ row.probe1 or '' }}"></label><label>Probe 2 target °F<input name="probe2" type="number" min="50" max="500" value="{{ row.probe2 or '' }}"></label></div>
+          <button name="action" value="edit">Save changes</button>
+          <button class="secondary" name="action" value="delete" formnovalidate data-confirm-remove>Remove preset</button>
+        </form>
+      </details>
+    </article>
+  {% endfor %}
+  </div>
+  {% if active %}<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="index" value="0"><button class="secondary" name="action" value="deactivate">End active cook</button></form>{% endif %}
+</section>
+<section class="card history">
+  <h2>Add a cook</h2>
+  <form method="post" class="preset-form">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}">
+    <label>Cook name<input name="name" maxlength="60" required placeholder="e.g. Brisket in foil"></label>
+    <div class="preset-fields"><label>Grill target °F<input name="grill" type="number" min="50" max="500" required placeholder="225"></label><label>Probe 1 target °F<input name="probe1" type="number" min="50" max="500" placeholder="Optional"></label><label>Probe 2 target °F<input name="probe2" type="number" min="50" max="500" placeholder="Optional"></label></div>
+    <button name="action" value="add">Save new preset</button>
+  </form>
+</section>
+</main>
+<script src="{{ url_for('static', filename='cooks.js') }}" defer></script>
+</body></html>
