@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+private/
+data/
+legacy_backup/
+*.log
+.env
+.venv/
