@@ -14,5 +14,7 @@
 <p class="note">The collector uses this interval for its next sensor sample.</p>
 <label>Dashboard refresh interval (2–60 seconds)<input name="refresh_seconds" type="number" min="2" max="60" step="1" required value="{{ intervals.refresh_seconds }}"></label>
 <p class="note">The dashboard checks for new readings at this interval. A faster refresh cannot create sensor readings between samples.</p>
+<label class="check"><input name="gauge_ticks" type="checkbox" {% if intervals.gauge_ticks %}checked{% endif %}> Show gauge tick marks</label>
+<p class="note">Small marks every 10°F and longer marks every 50°F. Target markers remain visible.</p>
 <button name="action" value="save">Save update settings</button>
 </form></section></main></body></html>
