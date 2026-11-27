@@ -24,16 +24,16 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 
 | Page | Features |
 | --- | --- |
-| Dashboard | Gauges with target marks, Wi-Fi name, pellet level, matching trace colors, hover values and clickable legend. |
+| Dashboard | Gauges with target marks and optional time-to-target estimates, Wi-Fi name, pellet level, matching trace colors, hover values and clickable legend. |
 | Cook Presets | Save targets, activate a cook and start a fresh chart session without deleting old readings. |
 | Notifications | Configure Pushover keys and individual alerts. |
-| Settings | Set sensor and browser update intervals; toggle gauge tick marks. |
+| Settings | Set sensor and browser update intervals; toggle gauge tick marks and time-to-target estimates. |
 
 ![Saved cook presets](docs/images/cooks.png)
 
 ![Update settings and gauge marks](docs/images/settings.png)
 
-Read the illustrated [user guide](docs/USER_GUIDE.md).
+Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows “calculating” until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
 
 ## How it works
 
