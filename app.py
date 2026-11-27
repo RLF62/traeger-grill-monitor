@@ -18,6 +18,7 @@ from flask import Flask, abort, jsonify, redirect, render_template, request, ses
 from alert_rules import DEFAULTS
 import cook_presets
 import update_settings
+from eta import estimate
 
 BASE = Path(__file__).resolve().parent
 PRIVATE = BASE / "private"
@@ -207,16 +208,19 @@ def api_readings():
     latest = rows[-1] if rows else None
     history = ([row for row in rows if row["time"] >= cook_session["started_at"]]
                if cook_session else rows)
+    stale = not latest or datetime.now() - datetime.fromisoformat(latest["time"]) > timedelta(minutes=3)
+    settings_data = update_settings.load()
+    eta = estimate(history, active, stale) if active and settings_data["show_eta"] else {}
     if len(history) > 400:
         step = (len(history) + 398) // 399
         history = history[::step]
         if history[-1] != latest:
             history.append(latest)
-    stale = not latest or datetime.now() - datetime.fromisoformat(latest["time"]) > timedelta(minutes=3)
     return jsonify({"latest": latest, "history": history, "stale": stale, "wifi_name": wifi_name(),
                     "active_cook": active, "session_start": cook_session["started_at"] if cook_session else None,
-                    "refresh_seconds": update_settings.load()["refresh_seconds"],
-                    "gauge_ticks": update_settings.load()["gauge_ticks"]})
+                    "refresh_seconds": settings_data["refresh_seconds"],
+                    "gauge_ticks": settings_data["gauge_ticks"],
+                    "show_eta": settings_data["show_eta"], "eta": eta})
 
 
 @app.route("/")
@@ -233,7 +237,8 @@ def settings():
         try:
             update_settings.save(request.form.get("sample_seconds", ""),
                                  request.form.get("refresh_seconds", ""),
-                                 request.form.get("gauge_ticks") == "on")
+                                 request.form.get("gauge_ticks") == "on",
+                                 request.form.get("show_eta") == "on")
             return redirect(url_for("settings", result="saved"))
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
@@ -310,7 +315,7 @@ def notifications():
             abort(400)
         if not secure_form:
             abort(403)
-        token = request.form.get("pushover_app_token", "").strip() or cfg.get("PUSHOVER_APP_TOKEN", "")
+        token=[REDACTED] "").strip() or cfg.get("PUSHOVER_APP_TOKEN", "")
         user = request.form.get("pushover_user_key", "").strip() or cfg.get("PUSHOVER_USER_KEY", "")
         if not KEY_PATTERN.fullmatch(token) or not KEY_PATTERN.fullmatch(user):
             return redirect(url_for("notifications", result="invalid"))
