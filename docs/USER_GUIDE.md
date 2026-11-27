@@ -29,6 +29,12 @@ Set the **sensor sample interval** to 10-300 seconds (default 60) and **dashboar
 
 Open **Notifications** to save a Pushover application token and user key, select individual alerts, and send a test message. The worker continues when the browser is closed. Credentials stay in the Pi's Git-ignored `private/` directory. Check alert thresholds and test delivery before relying on them.
 
+### Traeger notification icon
+
+![Traeger Pushover icon](../static/pushover-icon.png)
+
+Download [the 72 × 72 PNG](../static/pushover-icon.png). On the Pushover website, open the application whose API token is entered in **Notifications**, choose **Edit**, and upload this image as its application icon. Send a test notification afterward. The app icon is managed by Pushover for that token; no icon setting is needed in the Pi's message sender.
+
 ## When readings stop
 
 Check the last sample timestamp, then on the Pi run `sudo systemctl status traeger-collector traeger-monitor traeger-notifications` and `sudo journalctl -u traeger-collector -n 50 --no-pager`. Verify ADC channels and wiring with the [hardware guide](INSTALL.md). Reload the page if the browser itself is stale.
