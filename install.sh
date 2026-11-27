@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
   echo 'Usage: sudo bash install.sh [--port-80] [--check]'
-  echo 'The private repository must be cloned first as the regular Pi user.'
+  echo 'Clone the public repository first as the regular Pi user.'
 }
 PORT80=0
 CHECK=0
