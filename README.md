@@ -23,9 +23,17 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 | Notifications | Configure Pushover keys and individual alerts. |
 | Settings | Set sensor and browser update intervals; toggle gauge tick marks and time-to-target estimates. |
 
-![Saved cook presets](docs/images/cooks.png)
+### Estimated time to target
 
-![Update settings and gauge marks](docs/images/settings.png)
+This recorded warmup example shows an estimate beneath the Grill gauge. Estimates recalculate with each new sensor sample and can change as temperatures rise or fall. A probe without a useful rising trend shows “calculating” until enough readings arrive.
+
+![Recorded grill warmup showing time to target beneath the gauges](docs/images/time-to-target.png)
+
+The option can be turned off in Settings:
+
+![Settings with the Show estimated time to target option](docs/images/settings.png)
+
+![Saved cook presets](docs/images/cooks.png)
 
 Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows “calculating” until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
 
