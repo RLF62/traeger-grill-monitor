@@ -315,7 +315,7 @@ def notifications():
             abort(400)
         if not secure_form:
             abort(403)
-        token=[REDACTED] "").strip() or cfg.get("PUSHOVER_APP_TOKEN", "")
+        token = request.form.get("pushover_app_token", "").strip() or cfg.get("PUSHOVER_APP_TOKEN", "")
         user = request.form.get("pushover_user_key", "").strip() or cfg.get("PUSHOVER_USER_KEY", "")
         if not KEY_PATTERN.fullmatch(token) or not KEY_PATTERN.fullmatch(user):
             return redirect(url_for("notifications", result="invalid"))
