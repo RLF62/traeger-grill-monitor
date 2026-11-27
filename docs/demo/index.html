@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Traeger Grill Monitor · Interactive Demo</title>
+  <link rel="icon" type="image/svg+xml" href="./grill-icon.svg">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header><span class="brand-icon"><span class="smoke" aria-hidden="true"><i></i><i></i><i></i></span><img class="logo" src="./grill-icon.svg" alt=""></span><div><strong>Traeger Grill Monitor</strong><small>Interactive demo · sample readings</small></div></header>
+<main id="dashboard">
+  <nav><a href="#dashboard" aria-current="page">Dashboard</a><a href="#presets">Cook Presets</a><a href="#settings">Settings</a><a href="#about">Notifications</a></nav>
+  <section class="card demo-intro"><p class="eyebrow">INTERACTIVE SIMULATION</p><h1>Explore the grill monitor</h1><p>Sample temperatures change automatically. This page never connects to a grill or sends hardware commands.</p><div class="demo-controls"><button type="button" id="demo-pause">Pause simulation</button><button type="button" id="demo-reset">Restart cook</button><label>Demo speed <select id="demo-speed"><option value="1">Normal</option><option value="3">3×</option><option value="6">6×</option></select></label></div></section>
+<section class="card cook-status"><div class="section-title"><div><p class="eyebrow">NOW COOKING</p><h2 id="cook-name">Checking active cook…</h2></div><a class="small-link" href="#presets">Choose a cook</a></div><p id="cook-targets" class="note"></p></section>
+  <section class="card">
+    <div class="section-title"><div><p class="eyebrow">SIMULATED COOK</p><h1>Grill overview</h1></div><span class="live-status" id="live-status" role="status">Connecting…</span></div>
+    <p class="stamp" id="sample-time">Loading the latest reading…</p>
+    <div class="dial-grid">
+      <article class="dial-card" data-field="grill"><button type="button" class="dial" style="--amount:0" aria-label="Change Grill ring and chart color" title="Change Grill color"><span class="dial-center"><span>Grill</span><strong id="grill-value">—</strong><small>°F</small></span><svg class="target-overlay" viewBox="0 0 200 200" aria-hidden="true"></svg></button><input class="ring-picker" type="color" data-color="grill" aria-label="Grill color"><p>Target <b id="grill-target">—</b> °F</p><p class="eta" id="grill-eta" hidden></p></article>
+      <article class="dial-card" data-field="probe1"><button type="button" class="dial" style="--amount:0" aria-label="Change Probe 1 ring and chart color" title="Change Probe 1 color"><span class="dial-center"><span>Probe 1</span><strong id="probe1-value">—</strong><small>°F</small></span><svg class="target-overlay" viewBox="0 0 200 200" aria-hidden="true"></svg></button><input class="ring-picker" type="color" data-color="probe1" aria-label="Probe 1 color"><p>Target <b id="probe1-target">—</b> °F</p><p class="eta" id="probe1-eta" hidden></p></article>
+      <article class="dial-card" data-field="probe2"><button type="button" class="dial" style="--amount:0" aria-label="Change Probe 2 ring and chart color" title="Change Probe 2 color"><span class="dial-center"><span>Probe 2</span><strong id="probe2-value">—</strong><small>°F</small></span><svg class="target-overlay" viewBox="0 0 200 200" aria-hidden="true"></svg></button><input class="ring-picker" type="color" data-color="probe2" aria-label="Probe 2 color"><p>Target <b id="probe2-target">—</b> °F</p><p class="eta" id="probe2-eta" hidden></p></article>
+    </div>
+    <p class="color-hint">The bright marker shows the target temperature. Click a ring to change its color and matching chart line.</p>
+    <div class="metrics"><div><span>Pellet hopper</span><strong id="pellets">—</strong><button class="pellet-color-button" type="button" aria-label="Change pellet bar and chart color" title="Change pellet color"><span class="meter"><span id="pellet-fill"></span></span></button><input class="ring-picker" type="color" data-color="pellets" aria-label="Pellet color"><small>Click the bar to change its color</small></div><div><span>Wi-Fi signal</span><strong id="wifi">—</strong><small id="wifi-name">Checking network…</small></div><div><span>Pi temperature</span><strong id="pi-temp">—</strong></div></div>
+  </section>
+  <section class="card history"><div class="section-title"><div><p class="eyebrow">THE COOK, AT A GLANCE</p><h2>Temperature history</h2></div><div class="legend" role="group" aria-label="Show or hide chart lines">
+  <button type="button" class="legend-toggle" data-series="grill" aria-pressed="true"><i class="grill-line"></i>Grill</button>
+  <button type="button" class="legend-toggle" data-series="probe1" aria-pressed="true"><i class="p1-line"></i>Probe 1</button>
+  <button type="button" class="legend-toggle" data-series="probe2" aria-pressed="true"><i class="p2-line"></i>Probe 2</button>
+  <button type="button" class="legend-toggle" data-series="pellets" aria-pressed="true"><i class="pellet-line"></i>Pellets</button>
+</div></div><svg id="trend" viewBox="0 0 800 260" role="img" aria-label="Recent grill, probe, and pellet readings"></svg><div id="chart-tooltip" class="chart-tooltip" hidden></div><p class="note">Temperature uses the left scale; pellets use the right percentage scale. Click a legend item to show or hide its line.</p></section>
+  <p class="foot-note">Demo readings are generated in your browser. This simulation has no connection to the grill and sends no commands or notifications.</p>
+<section class="card demo-options" id="presets"><p class="eyebrow">DEMO COOK PRESETS</p><h2>Try another cook</h2><label>Choose a sample preset <select id="demo-preset"><option value="smoke">Smoked chicken · Grill 225°F · Probe 165°F</option><option value="roast">Roast · Grill 350°F · Probe 145°F</option><option value="sear">Sear · Grill 400°F · Probe 130°F</option></select></label><p class="note">Changing a preset starts a new simulated cook.</p></section>
+<section class="card demo-options" id="settings"><p class="eyebrow">SIMULATED SETTINGS</p><h2>Adjust the display</h2><label class="check"><input id="demo-eta" type="checkbox" checked> Show estimated time to target</label><label class="check"><input id="demo-ticks" type="checkbox" checked> Show gauge tick marks</label><p class="note">These controls affect only this browser demo. The real monitor has its own Settings page.</p></section>
+<section class="card demo-options" id="about"><p class="eyebrow">ABOUT THE DEMO</p><h2>Read-only sample data</h2><p>Pellet level, Wi-Fi and temperature readings are simulated. The real application keeps notifications and saved cook presets on the Raspberry Pi.</p><p><a href="https://github.com/RLF62/traeger-grill-monitor">Back to the project README</a></p></section>
+</main>
+<script src="./demo.js"></script>
+<script src="./dashboard.js" defer></script>
+</body></html>

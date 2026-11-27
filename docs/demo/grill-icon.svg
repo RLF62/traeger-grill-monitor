@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Grill and temperature gauge">
+  <rect x="2" y="2" width="124" height="124" rx="24" fill="#17171b"/>
+  <path d="M30 47a35 35 0 0 1 68 0" fill="none" stroke="#ff9f17" stroke-width="6" stroke-linecap="round"/>
+  <path d="M65 49 81 32" stroke="#f4f0e9" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="64" cy="49" r="5" fill="#f4f0e9"/>
+  <path d="M35 60q2-10 11-10h36q9 0 11 10v12H35zM35 76h58q-1 8-7 8H42q-6 0-7-8" fill="#f4f0e9"/>
+  <path d="M34 64H21m72-2 10-8v-4l5 4v18l-12 7" fill="none" stroke="#f4f0e9" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M44 84 38 106m45-22 6 22M40 100h49" stroke="#f4f0e9" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="90" cy="106" r="6" fill="#17171b" stroke="#f4f0e9" stroke-width="4"/>
+  <path d="M63 97c-8-7-2-13 0-17 0 7 9 9 5 17-2-5-5-3-5 0" fill="#ff8517"/>
+</svg>
