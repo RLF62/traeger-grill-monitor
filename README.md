@@ -2,6 +2,10 @@
 
 A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and probe temperatures, pellet level, Wi-Fi status, history, saved cook presets and Pushover alerts. **The monitor reads sensors; it does not control the grill.**
 
+## Try the interactive demo
+
+[Open the simulated Traeger Grill Monitor](https://rlf62.github.io/traeger-grill-monitor/demo/). It runs with sample readings in your browser. Try the cook presets, gauge tick marks, and estimated time-to-target controls without connecting to a grill or sending alerts.
+
 ## Estimated time to target
 
 On your Pi, open **Settings** and use **Show estimated time to target** to turn predictions on or off:
