@@ -17,15 +17,14 @@ The installer adds an ADS1115 overlay at I�C address `0x49` if the four channe
 
 ## Fresh install
 
-1. Prepare Raspberry Pi OS with network access and a regular account with `sudo`. The account you use with GitHub must access the private `RLF62/traeger-grill-monitor` repository.
-2. Install GitHub CLI and sign in once: `sudo apt update && sudo apt install -y gh && gh auth login`. Complete the interactive device sign-in.
-3. Install the package in one line from the regular Pi account:
+1. Prepare Raspberry Pi OS with network access and a regular account with `sudo`.
+2. Install the public package in one line from the regular Pi account:
 
    ```bash
-   gh repo clone RLF62/traeger-grill-monitor && sudo bash traeger-grill-monitor/install.sh --port-80
+   sudo apt update && sudo apt install -y git && git clone https://github.com/RLF62/traeger-grill-monitor.git && sudo bash traeger-grill-monitor/install.sh --port-80
    ```
 
-4. Reboot with `sudo reboot` if the installer requests it. Open the URL printed by the installer. Apache on port 80 admits loopback and `192.168.1.0/24`; change `deploy/apache-traeger.conf` for a different trusted subnet before installation. Omit `--port-80` to serve on port 8081 only.
+3. Reboot with `sudo reboot` if the installer requests it. Open the URL printed by the installer. Apache on port 80 admits loopback and `192.168.1.0/24`; change `deploy/apache-traeger.conf` for a different trusted subnet before installation. Omit `--port-80` to serve on port 8081 only.
 
 Run `bash traeger-grill-monitor/install.sh --check --port-80` for model, folder and ADC preflight. The installer refuses to overwrite an existing monitor service, old PHP collector, occupied port 8081 or customized Apache site. Do not run two collectors. On the original Pi, syntax and preflight passed; a fresh end-to-end second-Pi installation has not yet been exercised.
 
