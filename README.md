@@ -2,7 +2,15 @@
 
 A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and probe temperatures, pellet level, Wi-Fi status, history, saved cook presets and Pushover alerts. **The monitor reads sensors; it does not control the grill.**
 
-![Dashboard with gauges and history](docs/images/dashboard.png)
+## Estimated time to target
+
+On your Pi, open **Settings** and use **Show estimated time to target** to turn predictions on or off:
+
+![Settings page showing the estimated time to target on/off checkbox](docs/images/settings-time-to-target.png)
+
+A recorded warmup example shows an estimate beneath the Grill gauge. It recalculates with each new sensor sample, so the predicted time can change. A probe with no useful rising trend shows “calculating” until enough readings arrive.
+
+![Recorded grill warmup showing about 14 minutes to target](docs/images/time-to-target.png)
 
 ## One-line install
 
@@ -22,18 +30,6 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 | Cook Presets | Save targets, activate a cook and start a fresh chart session without deleting old readings. |
 | Notifications | Configure Pushover keys and individual alerts. |
 | Settings | Set sensor and browser update intervals; toggle gauge tick marks and time-to-target estimates. |
-
-### Estimated time to target
-
-This recorded warmup example shows an estimate beneath the Grill gauge. Estimates recalculate with each new sensor sample and can change as temperatures rise or fall. A probe without a useful rising trend shows “calculating” until enough readings arrive.
-
-![Recorded grill warmup showing time to target beneath the gauges](docs/images/time-to-target.png)
-
-The option can be turned off in Settings:
-
-![Settings with the Show estimated time to target option](docs/images/settings.png)
-
-![Saved cook presets](docs/images/cooks.png)
 
 Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows “calculating” until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
 
