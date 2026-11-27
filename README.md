@@ -6,19 +6,13 @@ A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and
 
 ## One-line install
 
-On a fresh Raspberry Pi OS installation with matching ADS1115 hardware, install GitHub CLI and authenticate once with an account that can access this **private** repository:
+On a fresh Raspberry Pi OS installation with matching ADS1115 hardware, run this as the normal Pi user:
 
 ```bash
-sudo apt update && sudo apt install -y gh && gh auth login
+sudo apt update && sudo apt install -y git && git clone https://github.com/RLF62/traeger-grill-monitor.git && sudo bash traeger-grill-monitor/install.sh --port-80
 ```
 
-Then run this one line as the normal Pi user:
-
-```bash
-gh repo clone RLF62/traeger-grill-monitor && sudo bash traeger-grill-monitor/install.sh --port-80
-```
-
-Open the URL printed at the end. Reboot first if the installer enables the ADC overlay. Omit `--port-80` to use port 8081 only. The bundled Apache config allows the `192.168.1.0/24` trusted LAN; review it for another subnet. The installer stops if an older PHP monitor or new service already exists. See [installation and hardware](docs/INSTALL.md) for details. A private repository cannot be installed with anonymous `curl`; do not put access tokens in a shell command.
+Open the URL printed at the end. Reboot first if the installer enables the ADC overlay. Omit `--port-80` to use port 8081 only. The bundled Apache config allows the `192.168.1.0/24` trusted LAN; review it for another subnet. The installer stops if an older PHP monitor or new service already exists. See [installation and hardware](docs/INSTALL.md) for details. The source repository is public. The dashboard itself is intended for the trusted LAN and has no public Internet login.
 
 ## Screens
 
