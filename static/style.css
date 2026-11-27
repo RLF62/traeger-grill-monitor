@@ -130,3 +130,6 @@ button.pellet-color-button:hover .meter, button.pellet-color-button:focus-visibl
 
 .target-overlay .gauge-tick { stroke:#a6bac2; stroke-width:1.4; opacity:.65; }
 .target-overlay .gauge-tick.major { stroke:#d3e0df; stroke-width:2; opacity:.85; }
+
+.dial-card .eta { margin:6px 0 0; color:#a9d8a2; font-size:.88rem; min-height:1.3em; }
+.dial-card .eta[hidden] { display:none; }
