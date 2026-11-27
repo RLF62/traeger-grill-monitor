@@ -11,6 +11,7 @@ The dashboard shows the grill, two probes, pellet hopper, Pi temperature and Wi-
 - Click a gauge ring to change its color and the matching chart trace. Click the colored line in the pellet hopper box to change its trace color.
 - Hover a chart line, or tap near it, for the time, sensor name and value. Click a legend item to hide or show that trace. Pellet level has its own percentage scale.
 - The active cook appears on the front page. Activating a preset starts a fresh chart session; older readings remain stored.
+- Estimated time to target appears below each gauge when the current cook has a target and recent readings show a rising trend. The estimate recalculates with every new sensor sample and may change substantially during warmup. A moved probe begins a new trend; cooling or steady readings show “calculating” until there is a useful rise. A missing probe shows no estimate.
 
 ## Cook Presets
 
@@ -22,7 +23,7 @@ Open **Cook Presets** to save grill, Probe 1 and Probe 2 targets and a descripti
 
 ![Sensor timing and gauge tick options](images/settings.png)
 
-Set the **sensor sample interval** to 10-300 seconds (default 60) and **dashboard refresh** to 2-60 seconds (default 15). A faster refresh does not create more sensor samples; the collector applies a changed interval after its current sleep. Toggle 10�F gauge tick marks (longer every 50�F) without hiding target marks.
+Set the **sensor sample interval** to 10-300 seconds (default 60) and **dashboard refresh** to 2-60 seconds (default 15). A faster refresh does not create more sensor samples; the collector applies a changed interval after its current sleep. Toggle 10°F gauge tick marks (longer every 50°F) without hiding target marks. Uncheck **Show estimated time to target** to hide the estimates.
 
 ## Notifications
 
