@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 let previousSample = '';
 let previousCook = '';
 let previousTicks = null;
+let previousEta = null;
 let showGaugeTicks = false;
 let currentHistory = [];
 let refreshMs = 15000;
@@ -82,6 +83,19 @@ function updateDial(name, value, target) {
   animateDial(dial, amount);
   targetMarker(dial, target, 500);
   dial.classList.toggle('empty', !value || value <= 0);
+}
+function updateEta(name, entry, enabled) {
+  const node = $(name + '-eta');
+  node.hidden = !enabled;
+  if (!enabled) return;
+  if (!entry || entry.state === 'unavailable') node.textContent = 'Time to target: —';
+  else if (entry.state === 'reached') node.textContent = 'Target reached';
+  else if (entry.state === 'stale') node.textContent = 'Time to target: waiting for readings';
+  else if (entry.state === 'estimate') {
+    const minutes = entry.minutes;
+    node.textContent = 'Time to target: about ' + (minutes < 60 ? minutes + ' min' :
+      Math.floor(minutes / 60) + ' hr' + (minutes % 60 ? ' ' + minutes % 60 + ' min' : ''));
+  } else node.textContent = 'Time to target: calculating…';
 }
 function chart(rows, animate = true) {
   const svg = $('trend');
@@ -182,11 +196,17 @@ async function refresh() {
     $('sample-time').textContent = 'Last sample: ' + new Date(r.time).toLocaleString();
     const cookSignature = (cook ? [cook.name,cook.grill,cook.probe1,cook.probe2].join('|') : '') + '|' + (data.session_start || '');
     showGaugeTicks = data.gauge_ticks === true;
-    if (r.time === previousSample && cookSignature === previousCook && showGaugeTicks === previousTicks) return;
+    const etaSignature = JSON.stringify([data.show_eta, data.eta, data.stale]);
+    if (r.time === previousSample && cookSignature === previousCook &&
+        showGaugeTicks === previousTicks && etaSignature === previousEta) return;
+    previousEta = etaSignature;
     previousTicks = showGaugeTicks;
     previousSample = r.time;
     previousCook = cookSignature;
-    for (const name of ['grill','probe1','probe2']) updateDial(name, r[name], cook ? cook[name] : null);
+    for (const name of ['grill','probe1','probe2']) {
+      updateDial(name, r[name], cook ? cook[name] : null);
+      updateEta(name, data.eta && data.eta[name], data.show_eta === true && !!cook);
+    }
     $('pellets').textContent = fmt(r.pellets) + '%';
     $('pellet-fill').style.width = Math.max(0, Math.min(100, r.pellets || 0)) + '%';
     $('wifi').textContent = r.wifi || '—';
