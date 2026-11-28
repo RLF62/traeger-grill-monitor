@@ -36,7 +36,7 @@ For a **common-cathode, active-high** RGB LED with appropriate current-limiting 
 sudo bash ~/pellet-grill-monitor/deploy/install-rgb-led.sh
 ```
 
-Use your checkout's actual directory if it still has the former `traeger-grill-monitor` name. The helper installs the system Python GPIO library and service, disables an existing activity LED overlay on GPIO 27, and requests a reboot if it changed the boot configuration. Blue shows Wi-Fi connecting, green shows connected, and red shows disconnected; Settings has a 0–100% brightness slider (default 25%). This does not control the grill.
+Use your checkout's actual directory if it still has the former `traeger-grill-monitor` name. The helper installs the system Python GPIO library and service, disables an existing activity LED overlay on GPIO 27, and requests a reboot if it changed the boot configuration. The service starts after local filesystems and GPIO initialization, before network readiness: flashing blue shows Wi-Fi connecting, flashing red shows disconnected after 30 seconds, and steady green shows connected. The LED is off during firmware boot before Linux starts the service. Settings has a 0-100% brightness slider (default 25%). This does not control the grill.
 
 ## Verify
 

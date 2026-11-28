@@ -52,16 +52,24 @@ def main():
         for pin in PINS.values():
             lgpio.gpio_claim_output(chip, pin, 0)
         started = time.monotonic()
+        next_check = started
+        online = False
         last = None
         while RUNNING:
-            color = "green" if connected() else ("blue" if time.monotonic() - started < 30 else "red")
+            now = time.monotonic()
+            if now >= next_check:
+                online = connected()
+                next_check = now + 2
+            color = "green" if online else ("blue" if now - started < 30 else "red")
             level = brightness()
-            state = (color, level)
+            # Blink while connecting or disconnected; steady green means connected.
+            lit = online or int((now - started) / 0.6) % 2 == 0
+            state = (color, level, lit)
             if state != last:
                 for name, pin in PINS.items():
-                    set_channel(chip, pin, level if name == color else 0)
+                    set_channel(chip, pin, level if lit and name == color else 0)
                 last = state
-            time.sleep(2)
+            time.sleep(0.2)
     finally:
         for pin in PINS.values():
             try:

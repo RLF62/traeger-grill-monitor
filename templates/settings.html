@@ -26,7 +26,7 @@
 {% if rgb_led_available %}
 <label>RGB status LED brightness <output id="led-brightness-value">{{ intervals.led_brightness }}%</output>
 <input name="led_brightness" type="range" min="0" max="100" step="5" value="{{ intervals.led_brightness }}" id="led-brightness-slider"></label>
-<p class="note">Green means Wi-Fi connected, blue means connecting, and red means disconnected. At 0%, the LED is off. Changes apply within a few seconds.</p>
+<p class="note">Steady green means Wi-Fi connected. Flashing blue means connecting; flashing red means still disconnected after 30 seconds. At 0%, the LED is off. Changes apply within a few seconds.</p>
 {% endif %}
 <button name="action" value="save">Save settings</button>
 </form></section>

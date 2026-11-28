@@ -1,6 +1,9 @@
 [Unit]
 Description=Traeger RGB Wi-Fi status LED
-After=network.target
+DefaultDependencies=no
+After=local-fs.target systemd-udev-trigger.service
+Before=network.target shutdown.target
+Conflicts=shutdown.target
 
 [Service]
 Type=simple
