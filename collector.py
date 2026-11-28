@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 import cook_presets
+import pellet_calibration
 import update_settings
 
 BASE = Path(__file__).resolve().parent
@@ -47,11 +48,7 @@ def thermistor_f(raw):
 
 
 def pellet_percent(raw):
-    # Values this close to ground are outside the calibrated empty-hopper range.
-    # Treat a missing sensor signal as unavailable instead of an empty hopper.
-    if raw < 1000:
-        return None
-    return max(0, min(100, int((raw - 5000.0) / (24600.0 - 5000.0) * 100.0)))
+    return pellet_calibration.percent(raw)
 
 
 def pi_temp_f():

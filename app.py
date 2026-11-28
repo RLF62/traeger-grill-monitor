@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from flask import Flask, abort, jsonify, redirect, render_template, request, session, url_for
 from alert_rules import DEFAULTS
 import cook_presets
+import pellet_calibration
 import update_settings
 import update_manager
 from eta import estimate
@@ -251,10 +252,28 @@ def settings():
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
     return render_template("settings.html", intervals=update_settings.load(),
+                           pellet_calibration=pellet_calibration.load(),
+                           pellet_raw=pellet_calibration.current_raw(),
                            rgb_led_available=Path("/etc/systemd/system/traeger-led.service").exists(),
                            csrf=csrf_token(), result=request.args.get("result", ""),
                            update=update_manager.status(),
                            update_error=session.pop("update_error", ""))
+
+
+@app.route("/settings/pellet-calibration", methods=["POST"])
+def save_pellet_calibration():
+    check_csrf()
+    if not safe_credential_form():
+        abort(403)
+    try:
+        if request.form.get("action") == "reset":
+            pellet_calibration.save(**pellet_calibration.DEFAULT)
+        else:
+            pellet_calibration.save(request.form.get("empty_raw", ""),
+                                    request.form.get("full_raw", ""))
+        return redirect(url_for("settings", result="calibration_saved"))
+    except (ValueError, TypeError):
+        return redirect(url_for("settings", result="calibration_invalid"))
 
 
 @app.route("/settings/software-update", methods=["POST"])

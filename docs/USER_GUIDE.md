@@ -25,6 +25,10 @@ Open **Cook Presets** to save grill, Probe 1 and Probe 2 targets and a descripti
 
 Set **Page name** to the label you want in the page header and browser tab (up to 60 characters). Set the **sensor sample interval** to 10–300 seconds (default 60) and **dashboard refresh** to 2–60 seconds (default 15). A faster refresh does not create more sensor samples; the collector applies a changed interval after its current sleep. Toggle 10°F gauge tick marks (longer every 50°F) without hiding target marks. Uncheck **Show estimated time to target** to hide predictions.
 
+For **Pellet sensor calibration**, empty the hopper, refresh Settings, choose **Use current reading for Empty**, and save. Fill the hopper, refresh Settings again, choose **Use current reading for Full**, and save. You may also type the raw counts. The two readings must differ by at least 500 counts; their order can be reversed for sensors whose signal decreases as the hopper fills. The defaults are 5000 empty and 24600 full. **Restore defaults** discards your calibration. A near-ground disconnected signal is shown as **Sensor unavailable** instead of an empty hopper when the sensor uses a rising signal. Check the physical pellet level independently until you have verified both endpoints.
+
+On installations with the optional RGB status LED, the brightness slider controls all three colors: green for connected Wi-Fi, blue while connecting, and red when disconnected. Set it to 0% to turn the LED off.
+
 In **Update from GitHub**, select **Check for updates** to compare installed and available versions. If a newer release appears, select **Install update** and refresh this page after the services restart. Saved settings, readings, and cook presets remain in place.
 
 ## Notifications
