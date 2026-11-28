@@ -38,6 +38,12 @@ def git(*args, user=None, timeout=30):
     return command(["git", "-C", str(BASE)] + list(args), user=user, timeout=timeout)
 
 
+def version_at(ref, user=None):
+    value = command(["git", "-C", str(BASE), "show", ref + ":VERSION"],
+                    user=user, check=False).strip()
+    return value if value and len(value) <= 32 and value.startswith("v") else "Unversioned"
+
+
 def check(fetch=False, user=None):
     if git("remote", "get-url", "origin", user=user) != REMOTE:
         raise UpdateError("GitHub origin does not match the official Traeger repository.")
@@ -52,6 +58,8 @@ def check(fetch=False, user=None):
                               ["git", "-C", str(BASE), "merge-base", "--is-ancestor",
                                installed, available], timeout=10, check=False).returncode == 0
     return {"installed": installed[:12], "available": available[:12],
+            "installed_version": version_at(installed, user=user),
+            "available_version": version_at(available, user=user),
             "update_available": installed != available and ancestor,
             "blocked": dirty or not ancestor,
             "reason": ("Local tracked files have changed." if dirty else
@@ -71,11 +79,15 @@ def status():
         result = check()
     except UpdateError as exc:
         result = {"installed": "unknown", "available": "unknown",
+                  "installed_version": "Unknown", "available_version": "Unknown",
                   "update_available": False, "blocked": True, "reason": str(exc)}
     try:
         state = json.loads(STATE.read_text())
         if isinstance(state, dict):
             result.update({key: state.get(key, "") for key in ("phase", "message")})
+            if result["update_available"] and result.get("phase") == "success":
+                result["phase"] = ""
+                result["message"] = ""
     except (OSError, ValueError):
         pass
     return result
@@ -120,8 +132,7 @@ def install():
         for service in SERVICES:
             if command(["systemctl", "is-active", service]) != "active":
                 raise UpdateError(service + " did not start.")
-        write_state("success", "Installed GitHub commit " + git("rev-parse", "--short", "HEAD",
-                                                                   user=owner) + ".")
+        write_state("success", "Installed version " + version_at("HEAD", user=owner) + ".")
     except (UpdateError, OSError) as exc:
         if previous:
             try:

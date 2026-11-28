@@ -23,7 +23,7 @@
 <button name="action" value="save">Save update settings</button>
 </form></section>
 <section class="card"><p class="eyebrow">SOFTWARE UPDATES</p><h2>Update from GitHub</h2>
-<p>Installed: <strong>{{ update.installed }}</strong> � Available: <strong>{{ update.available }}</strong></p>
+<p>Installed version: <strong>{{ update.installed_version }}</strong><br>Available version: <strong>{{ update.available_version }}</strong></p>
 {% if result == 'checked' %}<p class="banner good" role="status">GitHub check completed.</p>{% endif %}
 {% if result == 'install_started' %}<p class="banner good" role="status">Update started. Refresh this page in a minute for the result.</p>{% endif %}
 {% if update_error %}<p class="banner bad" role="alert">{{ update_error }}</p>{% endif %}

@@ -45,9 +45,11 @@ Runtime files in `data/`, credentials and settings in `private/`, and the old ro
 
 ## Software updates
 
-Open **Settings  Update from GitHub** and select **Check for updates**. The page shows the installed and available commit IDs. Select **Install update** when one is available. The updater accepts only a clean fast-forward from this repository's `main` branch. It installs Python requirements, restarts the three monitor services, and reports the result on the page. If installation fails after the code changes, it restores the previous commit and restarts the services. Readings, cook presets, credentials and preferences are stored outside Git and remain in place.
+Open **Settings  Update from GitHub** and select **Check for updates**. The page shows the installed and available release versions. Select **Install update** when one is available. The updater accepts only a clean fast-forward from this repository's `main` branch. It installs Python requirements when they change, restarts the three monitor services, and reports the result on the page. If installation fails after the code changes, it restores the previous commit and restarts the services. Readings, cook presets, credentials and preferences are stored outside Git and remain in place.
 
 An existing installation made before this feature needs one setup step from its checkout: `sudo bash deploy/install-updater.sh`. A fresh installation includes that step. If a local tracked file was edited, the update is blocked so those changes can be reviewed first.
 The original .248 installation uses system Python rather than the fresh installer's virtual environment. Code updates work there; if a future release changes Python requirements, the updater stops and restores the previous code so dependencies can be updated manually.
 
 For troubleshooting, refresh Settings after an install and inspect `journalctl -u traeger-update.service -n 80 --no-pager` on the Pi if the update reports a failure.
+
+The displayed release number comes from `VERSION` in each commit. Bump it for each published release; the updater compares commits internally so it can still detect a newer commit when the number was not bumped.
