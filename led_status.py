@@ -37,7 +37,7 @@ def connected():
 
 def set_channel(chip, pin, duty):
     # A zero frequency stops the previous waveform before writing a steady level.
-    lgpio.tx_pwm(chip, pin, 0, 0)
+    lgpio.tx_pwm(chip, pin, 200, 0)
     if duty == 0 or duty == 100:
         lgpio.gpio_write(chip, pin, int(duty == 100))
     else:
