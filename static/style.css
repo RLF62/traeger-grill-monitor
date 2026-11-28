@@ -146,3 +146,8 @@ button.pellet-color-button:hover .meter, button.pellet-color-button:focus-visibl
 .dial-center .dial-reading small { font-size:.72rem; }
 
 select { display:block; width:min(100%,480px); padding:11px; border-radius:8px; border:1px solid #74808a; background:#12181d; color:white; font:inherit; }
+
+.unit-choices { display:flex; flex-wrap:wrap; align-items:center; gap:8px 22px; border:0; padding:0; margin:18px 0 0; }
+.unit-choices legend { padding:0; margin-bottom:4px; }
+.unit-choices label { display:inline-flex; align-items:center; gap:8px; margin:0; cursor:pointer; }
+.unit-choices input { width:auto; margin:0; accent-color:#f69c35; }

@@ -105,7 +105,7 @@ function targetMarker(dial, target, max) {
   label.setAttribute('x', labelPoint[0].toFixed(1));
   label.setAttribute('y', (labelPoint[1] + 4).toFixed(1));
   label.setAttribute('text-anchor', 'middle');
-  label.textContent = String(Math.round(target));
+  label.textContent = String(displayTemperature(target));
   svg.appendChild(label);
 }
 function updateDial(name, value, target) {
