@@ -42,7 +42,10 @@ def tick():
     samples = app.recent_readings(2)
     if not samples:
         return
-    current = samples[-1]
+    current = dict(samples[-1])
+    raw = current.get("pellet_raw")
+    current["pellet_status"] = (app.pellet_calibration.health(raw) if raw is not None
+                                else "unavailable" if current.get("pellets") is None else "legacy")
     saved = load_json(STATE)
     if saved.get("last_sample") == current["time"]:
         return
@@ -54,10 +57,15 @@ def tick():
     state, messages = evaluate(prior, current, state, settings)
     if not (settings["enabled"] and configured):
         messages = []
+        state = saved.get("flags", {})
     try:
         snoozed = datetime.now() < datetime.fromisoformat(settings.get("snooze_until") or "")
     except ValueError:
         snoozed = False
+    if snoozed:
+        state["sensor_check"] = saved.get("flags", {}).get("sensor_check", False)
+        if not settings.get("emergency_pellets"):
+            state["pellet_low"] = saved.get("flags", {}).get("pellet_low", False)
     for message in messages:
         emergency = (message.startswith("Grill temperature too") and settings.get("emergency_grill") or
                      message.startswith("Pellet level low") and settings.get("emergency_pellets"))

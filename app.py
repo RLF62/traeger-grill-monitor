@@ -530,7 +530,7 @@ def notifications():
                     5 <= thresholds["deviation_percent"] <= 40):
                 return redirect(url_for("notifications", result="invalid_alerts"))
             toggles = ("enabled", "new_cook", "grill_reached", "probe1_reached", "probe2_reached",
-                       "grill_deviation", "pellet_low", "pi_hot", "emergency_grill", "emergency_pellets")
+                       "grill_deviation", "pellet_low", "pellet_sensor", "pi_hot", "emergency_grill", "emergency_pellets")
             settings = dict(alert_settings(), **thresholds, **{key: key in request.form for key in toggles})
             save_alert_settings(settings)
             return redirect(url_for("notifications", result="alerts_saved"))
