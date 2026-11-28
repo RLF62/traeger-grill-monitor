@@ -166,7 +166,7 @@ def start_session(active, path=SESSION):
         records = _load_history()
         _close_previous(records, path)
         data = {"id": uuid.uuid4().hex, "preset": serialize(active),
-                "started_at": datetime.now().isoformat(timespec="seconds")}
+                "started_at": datetime.now().isoformat(timespec="microseconds")}
         records.append(_record(data))
         _write_history(records)
         _write_session(data, path)
@@ -224,7 +224,7 @@ def list_sessions(active=None):
     current = session_for(active) if active else None
     if current and not current.get("ended_at") and not any(row["id"] == current.get("id") for row in records):
         records.append(_record(current))
-    return sorted(records, key=lambda row: row["started_at"], reverse=True)
+    return sorted(reversed(records), key=lambda row: row["started_at"], reverse=True)
 
 
 def get_session(identifier, active=None):
