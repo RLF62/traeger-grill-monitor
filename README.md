@@ -8,7 +8,11 @@ A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and
 
 ## Settings
 
-![Traeger Settings page with page name, intervals, gauge options, and GitHub updates](docs/images/settings-current.png)
+![General Settings with page name, update intervals, gauges, and RGB LED brightness](docs/images/settings-general.png)
+
+![Pellet sensor calibration with live readings and empty/full capture](docs/images/settings-pellet-calibration.png)
+
+![Software updates showing installed and available versions](docs/images/settings-software-updates.png)
 
 Open **Settings** to change the page name shown in every header and browser tab, adjust the sensor sampling and dashboard refresh intervals, and switch gauge tick marks or time-to-target estimates on or off. In **Calibrate hopper level**, press **Start live readings** to see the raw sensor value update every second. Capture and save a stable reading with the hopper empty, then repeat when full. Press **Stop live readings** to return to normal sampling; each installation keeps its own values. On Pis fitted with the optional RGB status LED, Settings also has a brightness slider. Blue means connecting, green means Wi-Fi connected, and red means disconnected. The **Update from GitHub** section shows installed and available release versions. Choose **Check for updates**, then **Install update** when a new release is available. The dashboard may briefly disconnect while services restart; saved cooks, readings, and preferences remain in place.
 
