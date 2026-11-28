@@ -9,7 +9,7 @@ from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
 STATE = BASE / "private" / "software-update.json"
-REMOTE = "https://github.com/RLF62/traeger-grill-monitor.git"
+REMOTE = "https://github.com/RLF62/pellet-grill-monitor.git"
 UNIT = "traeger-update.service"
 SERVICES = ("traeger-collector.service", "traeger-notifications.service",
             "traeger-monitor.service")

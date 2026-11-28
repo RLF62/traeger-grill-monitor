@@ -24,11 +24,22 @@ APP_GROUP=$(id -gn "$APP_USER")
 [[ -f "$APP_DIR/requirements.txt" && -f "$APP_DIR/collector.py" ]] || { echo 'Run this from the cloned repository.' >&2; exit 1; }
 [[ "$APP_DIR" != *' '* ]] || { echo 'Clone into a path without spaces.' >&2; exit 1; }
 [[ -r /proc/device-tree/model ]] && grep -a -qi 'Raspberry Pi' /proc/device-tree/model || { echo 'A Raspberry Pi is required.' >&2; exit 1; }
+[[ -r /etc/os-release ]] || { echo 'Cannot determine Raspberry Pi OS version.' >&2; exit 1; }
+. /etc/os-release
+if [[ ! "${ID:-}" =~ ^(raspbian|debian)$ || ! "${VERSION_ID:-}" =~ ^[0-9]+$ ]] || (( VERSION_ID < 13 )); then
+  echo 'A fresh install requires Raspberry Pi OS Trixie (13) or newer; use the 32-bit Lite image on a Pi Zero W.' >&2
+  exit 1
+fi
+if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 12))'; then
+  echo 'Python 3.12 or newer is required. Install a current Raspberry Pi OS image.' >&2
+  exit 1
+fi
 ADC_READY=0
 for dev in /sys/bus/iio/devices/iio:device*; do
   if [[ -e "$dev/in_voltage0_raw" && -e "$dev/in_voltage1_raw" && -e "$dev/in_voltage2_raw" && -e "$dev/in_voltage3_raw" ]]; then ADC_READY=1; break; fi
 done
 if [[ $CHECK == 1 ]]; then
+  echo "Operating system: ${PRETTY_NAME}; $(python3 --version)"
   echo "User: $APP_USER; install folder: $APP_DIR; ADS1115 channels: $([[ $ADC_READY == 1 ]] && echo ready || echo 'need boot overlay and reboot')"
   echo "Dashboard: port 8081$([[ $PORT80 == 1 ]] && echo ' with Apache on port 80')"
   exit 0

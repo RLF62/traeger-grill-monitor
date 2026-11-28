@@ -2,7 +2,7 @@
 
 [README](../README.md) · [User guide](USER_GUIDE.md)
 
-The installer is for a **fresh Raspberry Pi OS** installation with the original monitor's ADS1115 sensor interface. It installs a Python virtual environment, local data folders, three systemd services, and optionally an Apache proxy. It does not supply probes, pellet hardware or a Pushover account. `collector.py` calibration matches the original Pi and must be checked on another grill.
+The installer is for a **fresh Raspberry Pi OS Lite 32-bit (Trixie 13 or newer, Python 3.12+)** installation with the original monitor's ADS1115 sensor interface. It installs a Python virtual environment, local data folders, three systemd services, and optionally an Apache proxy. It does not supply probes, pellet hardware or a Pushover account. `collector.py` calibration matches the original Pi and must be checked on another grill.
 
 ![ADS1115 sensor channel map](images/sensor-map.svg)
 
@@ -21,12 +21,12 @@ The installer adds an ADS1115 overlay at I²C address `0x49` if the four channel
 2. Install the public package in one line from the regular Pi account:
 
    ```bash
-   sudo apt update && sudo apt install -y git && git clone https://github.com/RLF62/traeger-grill-monitor.git && sudo bash traeger-grill-monitor/install.sh --port-80
+   sudo apt update && sudo apt install -y git && git clone https://github.com/RLF62/pellet-grill-monitor.git && sudo bash pellet-grill-monitor/install.sh --port-80
    ```
 
 3. Reboot with `sudo reboot` if the installer requests it. Open the URL printed by the installer. Apache on port 80 admits loopback and `192.168.1.0/24`; change `deploy/apache-traeger.conf` for a different trusted subnet before installation. Omit `--port-80` to serve on port 8081 only.
 
-Run `bash traeger-grill-monitor/install.sh --check --port-80` for model, folder and ADC preflight. The installer refuses to overwrite an existing monitor service, old PHP collector, occupied port 8081 or customized Apache site. Do not run two collectors. On the original Pi, syntax and preflight passed; a fresh end-to-end second-Pi installation has not yet been exercised.
+Run `bash pellet-grill-monitor/install.sh --check --port-80` for model, folder and ADC preflight. The installer refuses to overwrite an existing monitor service, old PHP collector, occupied port 8081 or customized Apache site. Do not run two collectors. A fresh Pi Zero W installation on Trixie with Python 3.13 was completed and verified. The installer checks the OS and Python version before installing packages. The original grill also needs its site-specific `dtparam=i2c_arm_baudrate=400000` and `dtoverlay=act-led,gpio=27` boot settings; these are not added for other users.
 
 ## Verify
 
