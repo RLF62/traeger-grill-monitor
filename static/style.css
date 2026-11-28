@@ -141,3 +141,6 @@ button.pellet-color-button:hover .meter, button.pellet-color-button:focus-visibl
 .sample-countdown progress::-webkit-progress-bar { background:#38434c; border-radius:99px; }
 .sample-countdown progress::-webkit-progress-value { background:#ffad48; border-radius:99px; }
 .sample-countdown progress::-moz-progress-bar { background:#ffad48; border-radius:99px; }
+
+.dial-center .dial-reading { display:flex; align-items:baseline; justify-content:center; gap:3px; white-space:nowrap; color:#f5f3ed; font-size:inherit; }
+.dial-center .dial-reading small { font-size:.72rem; }
