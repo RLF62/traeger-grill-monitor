@@ -42,7 +42,7 @@ In **Download your grill data**, save a backup ZIP before changing SD cards or r
 
 ## Notifications
 
-Open **Notifications** to save a Pushover application token and user key, select individual alerts, and send a test message. The worker continues when the browser is closed. Credentials stay in the Pi's Git-ignored `private/` directory. Check alert thresholds and test delivery before relying on them.
+Open **Notifications** to save a Pushover application token and user key, select individual alerts, and send a test message. When **Notify when a new cook starts** and the main alert switch are enabled, activating a preset sends its name and the latest grill temperature, pellet level, and Wi-Fi signal. Readings older than three minutes are shown as unavailable. A routine snooze also pauses cook start messages. The worker continues when the browser is closed. Credentials stay in the Pi's Git-ignored `private/` directory. Check alert thresholds and test delivery before relying on them.
 
 You can snooze routine alerts for 30 minutes, 1 hour, or 4 hours and resume them early. Optional repeating alerts for grill deviation or low pellets use Pushover emergency priority and repeat every minute for up to 30 minutes until acknowledged. These urgent alerts still send during a routine snooze. **Delivery status** shows the last send attempt and whether Pushover accepted it. Alerts are disabled until you turn them on.
 

@@ -12,7 +12,7 @@ The dashboard flags a pellet reading outside the saved calibration range instead
 
 **Cook Presets → View saved cook history** opens past sessions and lets you download each session's original readings as CSV. New sessions are saved when a cook starts and closed when it ends or restarts.
 
-In **Notifications**, routine alerts can be snoozed for 30 minutes, 1 hour, or 4 hours. Optional repeating Pushover alerts for grill deviation or low pellets continue until acknowledged or 30 minutes pass. Delivery status shows the last accepted or failed attempt. Automatic alerts remain off until explicitly enabled.
+In **Notifications**, a new cook can send its name, current grill temperature, pellet level, and Wi-Fi signal as soon as a preset is activated. Routine alerts can be snoozed for 30 minutes, 1 hour, or 4 hours. Optional repeating Pushover alerts for grill deviation or low pellets continue until acknowledged or 30 minutes pass. Delivery status shows the last accepted or failed attempt. Automatic alerts remain off until explicitly enabled.
 
 In **Settings → Backup**, download a ZIP of readings, saved cooks and cook history, calibration, and app preferences. It excludes Pushover credentials and session secrets; keep those separately when moving to another Pi.
 

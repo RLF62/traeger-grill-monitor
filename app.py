@@ -23,6 +23,7 @@ import update_manager
 import backup_export
 import alert_delivery
 import hopper_trend
+import cook_notification
 from eta import estimate
 
 BASE = Path(__file__).resolve().parent
@@ -110,6 +111,28 @@ def alert_settings():
         return dict(DEFAULTS, **data) if isinstance(data, dict) else dict(DEFAULTS)
     except (OSError, ValueError):
         return dict(DEFAULTS)
+
+
+def notify_cook_started(cook):
+    """A successful activation is retained even when alert delivery fails."""
+    settings = alert_settings()
+    if not (settings["enabled"] and settings.get("new_cook", True)):
+        return
+    try:
+        if datetime.now() < datetime.fromisoformat(settings.get("snooze_until") or ""):
+            return
+    except ValueError:
+        pass
+    if not (credentials().get("PUSHOVER_APP_TOKEN") and credentials().get("PUSHOVER_USER_KEY")):
+        return
+    try:
+        sample = recent_readings(1)
+        message = cook_notification.start_message(cook, sample[-1] if sample else None,
+                                                   update_settings.load()["temperature_unit"])
+        accepted = send_message(message)
+        alert_delivery.record(message, accepted)
+    except Exception:
+        app.logger.exception("Cook start alert failed")
 
 
 def save_alert_settings(data):
@@ -396,6 +419,7 @@ def cooks():
             after = cook_presets.active_cook()
             if action == "activate" and after:
                 cook_presets.start_session(after)
+                notify_cook_started(after)
             elif action == "edit":
                 cook_presets.update_session_preset(before, after)
             elif before and not after:
@@ -505,7 +529,7 @@ def notifications():
                     120 <= thresholds["pi_threshold"] <= 220 and
                     5 <= thresholds["deviation_percent"] <= 40):
                 return redirect(url_for("notifications", result="invalid_alerts"))
-            toggles = ("enabled", "grill_reached", "probe1_reached", "probe2_reached",
+            toggles = ("enabled", "new_cook", "grill_reached", "probe1_reached", "probe2_reached",
                        "grill_deviation", "pellet_low", "pi_hot", "emergency_grill", "emergency_pellets")
             settings = dict(alert_settings(), **thresholds, **{key: key in request.form for key in toggles})
             save_alert_settings(settings)

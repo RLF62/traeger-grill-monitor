@@ -1,6 +1,7 @@
 """Pure alert transitions for the read-only Traeger monitor."""
 DEFAULTS = {
     "enabled": False,
+    "new_cook": True,
     "grill_reached": True,
     "probe1_reached": True,
     "probe2_reached": True,

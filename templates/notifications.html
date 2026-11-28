@@ -49,6 +49,7 @@
     <form method="post">
       <input type="hidden" name="csrf" value="{{ csrf }}">
       <label class="check"><input type="checkbox" name="enabled" {% if settings.enabled %}checked{% endif %} {% if not configured or not secure_form %}disabled{% endif %}> Enable automatic Pushover alerts</label>
+      <label class="check"><input type="checkbox" name="new_cook" {% if settings.new_cook %}checked{% endif %} {% if not secure_form %}disabled{% endif %}> Notify when a new cook starts (name, current grill temperature, pellets, and Wi-Fi signal)</label>
       <div class="option-grid">
         {% for key, title in [('grill_reached','Grill target reached'),('probe1_reached','Probe 1 target reached'),('probe2_reached','Probe 2 target reached'),('grill_deviation','Grill too high / low and recovered'),('pellet_low','Low pellets'),('pi_hot','Pi temperature high')] %}
         <label class="check"><input type="checkbox" name="{{ key }}" {% if settings[key] %}checked{% endif %} {% if not secure_form %}disabled{% endif %}> {{ title }}</label>
