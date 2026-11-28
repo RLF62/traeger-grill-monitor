@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Notifications � {{ page_name }}</title>
+  <title>Notifications · {{ page_name }}</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -53,7 +53,7 @@
       </div>
       <div class="threshold-grid">
         <label>Low pellets at or below (%)<input name="pellet_threshold" type="number" min="5" max="50" value="{{ settings.pellet_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
-        <label>Pi temperature high (�F)<input name="pi_threshold" type="number" min="120" max="220" value="{{ settings.pi_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
+        <label>Pi temperature high (°F)<input name="pi_threshold" type="number" min="120" max="220" value="{{ settings.pi_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
         <label>Grill deviation (%)<input name="deviation_percent" type="number" min="5" max="40" value="{{ settings.deviation_percent }}" {% if not secure_form %}disabled{% endif %}></label>
       </div>
       <button name="action" value="save_alerts" {% if not secure_form %}disabled{% endif %}>Save alert settings</button>

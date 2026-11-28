@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Settings � {{ page_name }}</title>
+<title>Settings · {{ page_name }}</title>
 <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
 <body><header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>{{ page_name }}</strong><small>Update settings</small></div></header>
@@ -12,12 +12,12 @@
 <input type="hidden" name="csrf" value="{{ csrf }}">
 <label>Page name<input name="page_name" maxlength="60" required value="{{ intervals.page_name }}"></label>
 <p class="note">This name appears in the header and browser tab on every page.</p>
-<label>Sensor sample interval (10-300 seconds)<input name="sample_seconds" type="number" min="10" max="300" step="1" required value="{{ intervals.sample_seconds }}"></label>
+<label>Sensor sample interval (10–300 seconds)<input name="sample_seconds" type="number" min="10" max="300" step="1" required value="{{ intervals.sample_seconds }}"></label>
 <p class="note">The collector uses this interval for its next sensor sample.</p>
-<label>Dashboard refresh interval (2-60 seconds)<input name="refresh_seconds" type="number" min="2" max="60" step="1" required value="{{ intervals.refresh_seconds }}"></label>
+<label>Dashboard refresh interval (2–60 seconds)<input name="refresh_seconds" type="number" min="2" max="60" step="1" required value="{{ intervals.refresh_seconds }}"></label>
 <p class="note">The dashboard checks for new readings at this interval. A faster refresh cannot create sensor readings between samples.</p>
 <label class="check"><input name="gauge_ticks" type="checkbox" {% if intervals.gauge_ticks %}checked{% endif %}> Show gauge tick marks</label>
-<p class="note">Small marks every 10�F and longer marks every 50�F. Target markers remain visible.</p>
+<p class="note">Small marks every 10°F and longer marks every 50°F. Target markers remain visible.</p>
 <label class="check"><input name="show_eta" type="checkbox" {% if intervals.show_eta %}checked{% endif %}> Show estimated time to target</label>
 <p class="note">Shown below each gauge when a cook target and a steady rising trend provide enough data. Estimates change as the cook progresses.</p>
 <button name="action" value="save">Save update settings</button>

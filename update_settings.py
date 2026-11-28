@@ -26,7 +26,7 @@ def validate(sample, refresh, gauge_ticks=False, show_eta=True, page_name="Traeg
         raise ValueError("Gauge tick setting must be on or off.")
     sample, refresh = int(sample), int(refresh)
     if not 10 <= sample <= 300 or not 2 <= refresh <= 60:
-        raise ValueError("Sample interval must be 10-300 seconds and dashboard interval 2-60 seconds.")
+        raise ValueError("Sample interval must be 10–300 seconds and dashboard interval 2–60 seconds.")
     if not isinstance(page_name, str) or not (1 <= len(page_name.strip()) <= 60) or any(ord(c) < 32 for c in page_name):
         raise ValueError("Page name must be 1-60 characters without control characters.")
     return {"sample_seconds": sample, "refresh_seconds": refresh, "gauge_ticks": gauge_ticks,

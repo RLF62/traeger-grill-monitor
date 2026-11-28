@@ -12,7 +12,7 @@ On your Pi, open **Settings** and use **Show estimated time to target** to turn 
 
 ![Settings page showing the estimated time to target on/off checkbox](docs/images/settings-time-to-target.png)
 
-A recorded warmup example shows an estimate beneath the Grill gauge. It recalculates with each new sensor sample, so the predicted time can change. A probe with no useful rising trend shows "calculating" until enough readings arrive.
+A recorded warmup example shows an estimate beneath the Grill gauge. It recalculates with each new sensor sample, so the predicted time can change. A probe with no useful rising trend shows “calculating” until enough readings arrive.
 
 ![Recorded grill warmup showing about 14 minutes to target](docs/images/time-to-target.png)
 
@@ -35,13 +35,14 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 | Notifications | Configure Pushover keys and individual alerts. |
 | Settings | Change the page name, set sensor and browser update intervals, toggle gauge tick marks and time-to-target estimates, and check GitHub for software updates. |
 
-Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows "calculating" until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
+Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows “calculating” until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
 
 ## How it works
 
 `collector.py` reads the ADS1115 and Pi and writes `data/readings.csv`. `app.py` serves the dashboard on port 8081, optionally behind Apache on port 80. `cook_presets.py` manages recipes and chart sessions. `notification_worker.py` handles alerts. The three systemd services start on boot. Calibration is specific to the original sensors and should be verified against trusted measurements on another grill.
 
 Runtime files in `data/`, credentials and settings in `private/`, and the old rollback copy in `legacy_backup/` are excluded from Git. Back them up separately. The current live Pi is at `http://192.168.1.248/`; the new app does not read the previous PHP installation. Installer syntax and hardware preflight passed on that Pi; a clean second-Pi end-to-end install remains to be tested.
+
 
 ## Software updates
 
