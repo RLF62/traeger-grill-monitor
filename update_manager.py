@@ -41,7 +41,7 @@ def git(*args, user=None, timeout=30):
 def check(fetch=False, user=None):
     if git("remote", "get-url", "origin", user=user) != REMOTE:
         raise UpdateError("GitHub origin does not match the official Traeger repository.")
-    if git("branch", "--show-current", user=user) != "main":
+    if git("symbolic-ref", "--quiet", "--short", "HEAD", user=user) != "main":
         raise UpdateError("Switch the checkout to the main branch before updating.")
     if fetch:
         git("fetch", "--no-tags", "origin", "main", user=user, timeout=45)
