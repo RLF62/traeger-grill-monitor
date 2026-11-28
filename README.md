@@ -8,6 +8,8 @@ A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and
 
 ## Settings
 
+![Traeger Settings page with page name, intervals, gauge options, and GitHub updates](docs/images/settings-current.png)
+
 Open **Settings** to change the page name shown in every header and browser tab, adjust the sensor sampling and dashboard refresh intervals, and switch gauge tick marks or time-to-target estimates on or off. The **Update from GitHub** section shows installed and available release versions. Choose **Check for updates**, then **Install update** when a new release is available. The dashboard may briefly disconnect while services restart; saved cooks, readings, and preferences remain in place.
 
 ## Estimated time to target

@@ -21,6 +21,8 @@ Open **Cook Presets** to save grill, Probe 1 and Probe 2 targets and a descripti
 
 ## Settings
 
+![Current Settings page with page name and software updates](images/settings-current.png)
+
 Set **Page name** to the label you want in the page header and browser tab (up to 60 characters). Set the **sensor sample interval** to 10–300 seconds (default 60) and **dashboard refresh** to 2–60 seconds (default 15). A faster refresh does not create more sensor samples; the collector applies a changed interval after its current sleep. Toggle 10°F gauge tick marks (longer every 50°F) without hiding target marks. Uncheck **Show estimated time to target** to hide predictions.
 
 In **Update from GitHub**, select **Check for updates** to compare installed and available versions. If a newer release appears, select **Install update** and refresh this page after the services restart. Saved settings, readings, and cook presets remain in place.
