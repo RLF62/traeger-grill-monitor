@@ -13,7 +13,7 @@ The installer is for a **fresh Raspberry Pi OS Lite 32-bit (Trixie 13 or newer, 
 | `in_voltage2_raw` | Probe 2 |
 | `in_voltage3_raw` | Pellet level |
 
-The installer adds an ADS1115 overlay at I²C address `0x49` if the four channels are absent. Confirm I²C power and voltage, pin wiring, sensor types and calibration against a trusted thermometer before using readings or alerts.
+The installer adds an ADS1115 overlay at I²C address `0x49` if the four channels are absent. Confirm I²C power and voltage, pin wiring, sensor types and calibration against a trusted thermometer before using readings or alerts. If ADS1115 channel 3 is below 1000 raw counts (about 0.125 V at the default scale), the dashboard shows the pellet sensor as unavailable instead of reporting an empty hopper. Check the sensor power, ground, connector and A3 signal.
 
 ## Fresh install
 

@@ -207,7 +207,7 @@ async function refresh() {
       updateDial(name, r[name], cook ? cook[name] : null);
       updateEta(name, data.eta && data.eta[name], data.show_eta === true && !!cook);
     }
-    $('pellets').textContent = fmt(r.pellets) + '%';
+    $('pellets').textContent = r.pellets === null ? 'Sensor unavailable' : Math.round(r.pellets) + '%';
     $('pellet-fill').style.width = Math.max(0, Math.min(100, r.pellets || 0)) + '%';
     $('wifi').textContent = r.wifi || '—';
     $('pi-temp').textContent = fmt(r.pi_temp) + '°F';
