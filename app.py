@@ -18,6 +18,7 @@ from flask import Flask, abort, jsonify, redirect, render_template, request, ses
 from alert_rules import DEFAULTS
 import cook_presets
 import update_settings
+import update_manager
 from eta import estimate
 
 BASE = Path(__file__).resolve().parent
@@ -40,6 +41,11 @@ os.chmod(str(SESSION_KEY), 0o600)
 app = Flask(__name__)
 app.secret_key = SESSION_KEY.read_text().strip()
 app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Strict")
+
+
+@app.context_processor
+def page_branding():
+    return {"page_name": update_settings.load()["page_name"]}
 
 
 def credentials():
@@ -238,12 +244,38 @@ def settings():
             update_settings.save(request.form.get("sample_seconds", ""),
                                  request.form.get("refresh_seconds", ""),
                                  request.form.get("gauge_ticks") == "on",
-                                 request.form.get("show_eta") == "on")
+                                 request.form.get("show_eta") == "on",
+                                 request.form.get("page_name", ""))
             return redirect(url_for("settings", result="saved"))
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
     return render_template("settings.html", intervals=update_settings.load(),
-                           csrf=csrf_token(), result=request.args.get("result", ""))
+                           csrf=csrf_token(), result=request.args.get("result", ""),
+                           update=update_manager.status(),
+                           update_error=session.pop("update_error", ""))
+
+
+@app.route("/settings/software-update", methods=["POST"])
+def software_update():
+    check_csrf()
+    if not safe_credential_form():
+        abort(403)
+    action = request.form.get("action")
+    if action == "check":
+        try:
+            update_manager.check(fetch=True)
+            return redirect(url_for("settings", result="checked"))
+        except update_manager.UpdateError as exc:
+            session["update_error"] = str(exc)
+            return redirect(url_for("settings", result="update_error"))
+    if action == "install":
+        try:
+            update_manager.start_install()
+            return redirect(url_for("settings", result="install_started"))
+        except update_manager.UpdateError as exc:
+            session["update_error"] = str(exc)
+            return redirect(url_for("settings", result="update_error"))
+    abort(400)
 
 
 @app.route("/cooks", methods=["GET", "POST"])

@@ -12,7 +12,7 @@ On your Pi, open **Settings** and use **Show estimated time to target** to turn 
 
 ![Settings page showing the estimated time to target on/off checkbox](docs/images/settings-time-to-target.png)
 
-A recorded warmup example shows an estimate beneath the Grill gauge. It recalculates with each new sensor sample, so the predicted time can change. A probe with no useful rising trend shows “calculating” until enough readings arrive.
+A recorded warmup example shows an estimate beneath the Grill gauge. It recalculates with each new sensor sample, so the predicted time can change. A probe with no useful rising trend shows "calculating" until enough readings arrive.
 
 ![Recorded grill warmup showing about 14 minutes to target](docs/images/time-to-target.png)
 
@@ -33,9 +33,9 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 | Dashboard | Gauges with target marks and optional time-to-target estimates, Wi-Fi name, pellet level, matching trace colors, hover values and clickable legend. |
 | Cook Presets | Save targets, activate a cook and start a fresh chart session without deleting old readings. |
 | Notifications | Configure Pushover keys and individual alerts. |
-| Settings | Set sensor and browser update intervals; toggle gauge tick marks and time-to-target estimates. |
+| Settings | Change the page name, set sensor and browser update intervals, toggle gauge tick marks and time-to-target estimates, and check GitHub for software updates. |
 
-Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows “calculating” until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
+Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows "calculating" until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
 
 ## How it works
 
@@ -43,3 +43,8 @@ Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with eac
 
 Runtime files in `data/`, credentials and settings in `private/`, and the old rollback copy in `legacy_backup/` are excluded from Git. Back them up separately. The current live Pi is at `http://192.168.1.248/`; the new app does not read the previous PHP installation. Installer syntax and hardware preflight passed on that Pi; a clean second-Pi end-to-end install remains to be tested.
 
+## Software updates
+
+Open **Settings  Update from GitHub** and select **Check for updates**. The page shows the installed and available commit IDs. Select **Install update** when one is available. The updater accepts only a clean fast-forward from this repository's `main` branch. It installs Python requirements, restarts the three monitor services, and reports the result on the page. If installation fails after the code changes, it restores the previous commit and restarts the services. Readings, cook presets, credentials and preferences are stored outside Git and remain in place.
+
+An existing installation made before this feature needs one setup step from its checkout: `sudo bash deploy/install-updater.sh`. A fresh installation includes that step. If a local tracked file was edited, the update is blocked so those changes can be reviewed first.

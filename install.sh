@@ -96,6 +96,7 @@ for name in ('traeger-collector','traeger-monitor','traeger-notifications'):
     Path('/etc/systemd/system/'+name+'.service').write_text(source)
 PY
 systemctl daemon-reload
+  bash "$APP_DIR/deploy/install-updater.sh"
 systemctl enable --now traeger-monitor.service traeger-notifications.service
 if [[ $REBOOT == 0 ]]; then
   systemctl enable --now traeger-collector.service
