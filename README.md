@@ -49,3 +49,5 @@ Open **Settings  Update from GitHub** and select **Check for updates**. The pag
 
 An existing installation made before this feature needs one setup step from its checkout: `sudo bash deploy/install-updater.sh`. A fresh installation includes that step. If a local tracked file was edited, the update is blocked so those changes can be reviewed first.
 The original .248 installation uses system Python rather than the fresh installer's virtual environment. Code updates work there; if a future release changes Python requirements, the updater stops and restores the previous code so dependencies can be updated manually.
+
+For troubleshooting, refresh Settings after an install and inspect `journalctl -u traeger-update.service -n 80 --no-pager` on the Pi if the update reports a failure.
