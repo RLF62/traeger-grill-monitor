@@ -1,6 +1,6 @@
 # User guide
 
-[README](../README.md) � [Install and hardware](INSTALL.md)
+[README](../README.md) · [Install and hardware](INSTALL.md)
 
 ## Dashboard
 

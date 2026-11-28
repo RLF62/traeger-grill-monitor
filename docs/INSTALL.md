@@ -1,6 +1,6 @@
 # Installation, hardware and recovery
 
-[README](../README.md) � [User guide](USER_GUIDE.md)
+[README](../README.md) · [User guide](USER_GUIDE.md)
 
 The installer is for a **fresh Raspberry Pi OS** installation with the original monitor's ADS1115 sensor interface. It installs a Python virtual environment, local data folders, three systemd services, and optionally an Apache proxy. It does not supply probes, pellet hardware or a Pushover account. `collector.py` calibration matches the original Pi and must be checked on another grill.
 
@@ -13,7 +13,7 @@ The installer is for a **fresh Raspberry Pi OS** installation with the original 
 | `in_voltage2_raw` | Probe 2 |
 | `in_voltage3_raw` | Pellet level |
 
-The installer adds an ADS1115 overlay at I�C address `0x49` if the four channels are absent. Confirm I�C power and voltage, pin wiring, sensor types and calibration against a trusted thermometer before using readings or alerts.
+The installer adds an ADS1115 overlay at I²C address `0x49` if the four channels are absent. Confirm I²C power and voltage, pin wiring, sensor types and calibration against a trusted thermometer before using readings or alerts.
 
 ## Fresh install
 
