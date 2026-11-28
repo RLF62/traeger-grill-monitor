@@ -7,6 +7,7 @@ import os
 import shutil
 import stat
 import tempfile
+import uuid
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -132,6 +133,8 @@ def change(action, expected_version, index=None, preset=None,
         return rows
 
 SESSION = Path(__file__).resolve().parent / "private" / "cook-session.json"
+HISTORY = Path(__file__).resolve().parent / "private" / "cook-history.json"
+HISTORY_LOCK = Path(__file__).resolve().parent / "private" / "cook-history.lock"
 
 
 def session_for(active, path=SESSION, legacy_path=ACTIVE):
@@ -158,7 +161,74 @@ def session_for(active, path=SESSION, legacy_path=ACTIVE):
 
 def start_session(active, path=SESSION):
     """Begin a new chart without touching historical collector readings."""
-    _write_session({"preset": serialize(active), "started_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}, path)
+    with HISTORY_LOCK.open("a+") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        records = _load_history()
+        _close_previous(records, path)
+        data = {"id": uuid.uuid4().hex, "preset": serialize(active),
+                "started_at": datetime.now().isoformat(timespec="seconds")}
+        records.append(_record(data))
+        _write_history(records)
+        _write_session(data, path)
+
+
+def end_session(path=SESSION):
+    with HISTORY_LOCK.open("a+") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        records = _load_history()
+        _close_previous(records, path)
+        _write_history(records)
+
+
+def _load_history(path=None):
+    path = path or HISTORY
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, list) else []
+    except (OSError, ValueError):
+        return []
+
+
+def _record(data):
+    preset = parse_line(data.get("preset", "")) or {}
+    legacy_id = hashlib.sha256((data["started_at"] + data.get("preset", "")).encode("utf-8")).hexdigest()[:32]
+    return {"id": data.get("id") or legacy_id,
+            "name": preset.get("name", "Cook"), "grill": preset.get("grill"),
+            "probe1": preset.get("probe1"), "probe2": preset.get("probe2"),
+            "started_at": data["started_at"], "ended_at": data.get("ended_at")}
+
+
+def _close_previous(records, path):
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not data.get("started_at"):
+            return
+        match = next((row for row in records if row["id"] == data.get("id")), None)
+        if match is None:
+            match = _record(data)
+            records.append(match)
+        if not match.get("ended_at"):
+            match["ended_at"] = datetime.now().isoformat(timespec="seconds")
+        data["ended_at"] = match["ended_at"]
+        _write_session(data, path)
+    except (OSError, ValueError, TypeError, KeyError):
+        pass
+
+
+def _write_history(records, path=None):
+    _atomic_json(path or HISTORY, records)
+
+
+def list_sessions(active=None):
+    records = _load_history()
+    current = session_for(active) if active else None
+    if current and not current.get("ended_at") and not any(row["id"] == current.get("id") for row in records):
+        records.append(_record(current))
+    return sorted(records, key=lambda row: row["started_at"], reverse=True)
+
+
+def get_session(identifier, active=None):
+    return next((row for row in list_sessions(active) if row["id"] == identifier), None)
 
 
 def update_session_preset(old_active, new_active, path=SESSION):
@@ -166,9 +236,22 @@ def update_session_preset(old_active, new_active, path=SESSION):
     if data and new_active:
         data["preset"] = serialize(new_active)
         _write_session(data, path)
+        with HISTORY_LOCK.open("a+") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            records = _load_history()
+            for row in records:
+                if row["id"] == data.get("id"):
+                    row.update({"name": new_active["name"], "grill": new_active["grill"],
+                                "probe1": new_active["probe1"], "probe2": new_active["probe2"]})
+                    _write_history(records)
+                    break
 
 
 def _write_session(data, path):
+    _atomic_json(path, data)
+
+
+def _atomic_json(path, data):
     fd, temp = tempfile.mkstemp(prefix=".cook-session-", dir=str(path.parent))
     try:
         os.fchmod(fd, 0o600)

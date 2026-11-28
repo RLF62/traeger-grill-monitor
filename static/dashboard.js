@@ -231,6 +231,13 @@ async function refresh() {
     if (!data.latest) { $('sample-time').textContent = 'Waiting for the collector'; return; }
     const r = data.latest;
     $('sample-time').textContent = 'Last sample: ' + new Date(r.time).toLocaleString();
+    $('pellet-health').textContent = data.pellet_status === 'out_of_range' ?
+      'Outside calibrated range (raw ' + Math.round(r.pellet_raw) + '). Check sensor or calibration.' :
+      data.pellet_status === 'unavailable' ? 'Sensor reading unavailable' :
+      'Click the bar to change its color';
+    $('pellet-health').classList.toggle('sensor-warning', data.pellet_status === 'out_of_range');
+    $('hopper-eta').textContent = data.hopper_hours ?
+      'At the recent rate: about ' + data.hopper_hours + ' hours of pellets left' : '';
     const cookSignature = (cook ? [cook.name,cook.grill,cook.probe1,cook.probe2].join('|') : '') + '|' + (data.session_start || '') + '|' + temperatureUnit;
     showGaugeTicks = data.gauge_ticks === true;
     const etaSignature = JSON.stringify([data.show_eta, data.eta, data.stale]);
@@ -244,7 +251,8 @@ async function refresh() {
       updateDial(name, r[name], cook ? cook[name] : null);
       updateEta(name, data.eta && data.eta[name], data.show_eta === true && !!cook);
     }
-    $('pellets').textContent = r.pellets === null ? 'Sensor unavailable' : Math.round(r.pellets) + '%';
+    $('pellets').textContent = data.pellet_status === 'out_of_range' ? 'Check sensor' :
+      r.pellets === null ? 'Sensor unavailable' : Math.round(r.pellets) + '%';
     $('pellet-fill').style.width = Math.max(0, Math.min(100, r.pellets || 0)) + '%';
     $('wifi').textContent = r.wifi || '—';
     $('pi-temp').textContent = fmtTemperature(r.pi_temp) + '°' + temperatureUnit;

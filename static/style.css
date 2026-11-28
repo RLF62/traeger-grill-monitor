@@ -151,3 +151,9 @@ select { display:block; width:min(100%,480px); padding:11px; border-radius:8px; 
 .unit-choices legend { padding:0; margin-bottom:4px; }
 .unit-choices label { display:inline-flex; align-items:center; gap:8px; margin:0; cursor:pointer; }
 .unit-choices input { width:auto; margin:0; accent-color:#f69c35; }
+.history-list { display:grid; gap:12px; }
+.history-list article { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; padding:15px; border:1px solid #414850; border-radius:10px; background:#171d23; }
+.history-list p { margin:7px 0; color:#b6bec6; }
+.history-list small { color:#aab7c0; }
+.history-actions { display:flex; flex-wrap:wrap; gap:16px; }
+.metrics .sensor-warning { color:#ffbc73; line-height:1.4; }

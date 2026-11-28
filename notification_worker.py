@@ -5,9 +5,11 @@ import logging
 import os
 import tempfile
 import time
+from datetime import datetime
 from pathlib import Path
 
 import app
+import alert_delivery
 from alert_rules import DEFAULTS, evaluate
 
 STATE = app.PRIVATE / "alert-state.json"
@@ -52,8 +54,18 @@ def tick():
     state, messages = evaluate(prior, current, state, settings)
     if not (settings["enabled"] and configured):
         messages = []
+    try:
+        snoozed = datetime.now() < datetime.fromisoformat(settings.get("snooze_until") or "")
+    except ValueError:
+        snoozed = False
     for message in messages:
-        if app.send_message(message):
+        emergency = (message.startswith("Grill temperature too") and settings.get("emergency_grill") or
+                     message.startswith("Pellet level low") and settings.get("emergency_pellets"))
+        if snoozed and not emergency:
+            continue
+        delivered = app.send_message(message, emergency=bool(emergency))
+        alert_delivery.record(message, delivered, emergency=bool(emergency))
+        if delivered:
             logging.info("Sent alert: %s", message)
         else:
             logging.warning("Alert delivery failed: %s", message)

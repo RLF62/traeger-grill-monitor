@@ -49,6 +49,9 @@
 <button name="action" value="reset" formnovalidate>Restore defaults</button>
 </form></section>
 <script src="{{ url_for('static', filename='pellet-calibration.js') }}" defer></script>
+<section class="card"><p class="eyebrow">BACKUP</p><h2>Download your grill data</h2>
+<p class="note">Save a copy of your readings, cook presets and history, calibration, and app settings before moving cards or reinstalling. The ZIP does not contain your Pushover keys or browser session secret.</p>
+<p><a href="{{ url_for('settings_backup') }}">Download backup ZIP</a></p></section>
 <section class="card"><p class="eyebrow">SOFTWARE UPDATES</p><h2>Update from GitHub</h2>
 <p>Installed version: <strong>{{ update.installed_version }}</strong><br>Available version: <strong>{{ update.available_version }}</strong></p>
 {% if result == 'checked' %}<p class="banner good" role="status">GitHub check completed.</p>{% endif %}

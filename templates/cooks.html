@@ -12,6 +12,7 @@
 <nav><a href="{{ url_for('index') }}">Dashboard</a><a href="{{ url_for('cooks') }}" aria-current="page">Cook Presets</a><a href="{{ url_for('settings') }}">Settings</a><a href="{{ url_for('notifications') }}">Notifications</a></nav>
 <section class="card">
   <p class="eyebrow">COOK PRESETS</p><h1>Choose what’s cooking</h1>
+  <p><a href="{{ url_for('cook_history') }}">View saved cook history</a></p>
   <p class="note">Save your grill and probe temperatures once. Activate a cook to use its targets in both dashboards.</p>
   {% if result == 'saved' %}<p class="banner good" role="status">Cook presets updated.</p>{% endif %}
   {% if result == 'error' %}<p class="banner bad" role="alert">{{ reason }}</p>{% endif %}

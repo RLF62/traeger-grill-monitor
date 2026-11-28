@@ -14,12 +14,15 @@ from pathlib import Path
 from collections import deque
 from datetime import datetime, timedelta
 
-from flask import Flask, abort, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, abort, jsonify, redirect, render_template, request, send_file, session, url_for
 from alert_rules import DEFAULTS
 import cook_presets
 import pellet_calibration
 import update_settings
 import update_manager
+import backup_export
+import alert_delivery
+import hopper_trend
 from eta import estimate
 
 BASE = Path(__file__).resolve().parent
@@ -78,16 +81,19 @@ def save_credentials(token, user):
             os.unlink(tmp)
 
 
-def send_message(message):
+def send_message(message, emergency=False):
     cfg = credentials()
     if not cfg.get("PUSHOVER_APP_TOKEN") or not cfg.get("PUSHOVER_USER_KEY"):
         return False
-    body = urllib.parse.urlencode({
+    fields = {
         "token": cfg["PUSHOVER_APP_TOKEN"],
         "user": cfg["PUSHOVER_USER_KEY"],
         "title": "Traeger Grill Monitor",
         "message": message,
-    }).encode("utf-8")
+    }
+    if emergency:
+        fields.update(priority=2, retry=60, expire=1800)
+    body = urllib.parse.urlencode(fields).encode("utf-8")
     req = urllib.request.Request(PUSHOVER_URL, data=body, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=10) as response:
@@ -192,11 +198,12 @@ def recent_readings(limit=180):
         try:
             stamp = datetime.strptime(fields[0], "%Y-%m-%d %H:%M:%S")
             values = [float(fields[i]) if fields[i] else None for i in (1, 2, 4, 5, 6, 7, 8, 9)]
+            pellet_raw = float(fields[10]) if len(fields) > 10 and fields[10] else None
             if any(v is not None and (v < -50 or v > 1200) for v in values):
                 continue
         except ValueError:
             continue
-        rows.append(dict(time=stamp.isoformat(), grill=values[0], pellets=values[1],
+        rows.append(dict(time=stamp.isoformat(), grill=values[0], pellets=values[1], pellet_raw=pellet_raw,
                          probe1=values[2], probe2=values[3], probe1_target=values[4],
                          probe2_target=values[5], grill_target=values[6], pi_temp=values[7],
                          wifi=fields[3]))
@@ -213,6 +220,48 @@ def wifi_name():
         return ""
 
 
+def session_lines(cook_session):
+    start = datetime.fromisoformat(cook_session["started_at"])
+    end = datetime.fromisoformat(cook_session["ended_at"]) if cook_session.get("ended_at") else datetime.now()
+    try:
+        with READINGS.open(encoding="utf-8") as source:
+            for line in source:
+                fields = line.strip().split(",")
+                if len(fields) < 10:
+                    continue
+                try:
+                    stamp = datetime.strptime(fields[0], "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    continue
+                if start <= stamp <= end:
+                    yield stamp, fields
+                elif stamp > end:
+                    break
+    except OSError:
+        return
+
+
+def session_readings(cook_session):
+    rows = []
+    for stamp, fields in session_lines(cook_session):
+        try:
+            values = [float(fields[i]) if fields[i] else None for i in (1, 2, 4, 5)]
+        except ValueError:
+            continue
+        rows.append({"time": stamp.isoformat(), "grill": values[0], "pellets": values[1],
+                     "probe1": values[2], "probe2": values[3]})
+    return rows
+
+
+def selected_session(identifier):
+    if not re.fullmatch(r"[0-9a-f]{32}", identifier):
+        abort(404)
+    record = cook_presets.get_session(identifier, cook_presets.active_cook())
+    if not record:
+        abort(404)
+    return record
+
+
 @app.route("/api/readings")
 def api_readings():
     active = cook_presets.active_cook()
@@ -224,6 +273,9 @@ def api_readings():
     stale = not latest or datetime.now() - datetime.fromisoformat(latest["time"]) > timedelta(minutes=3)
     settings_data = update_settings.load()
     eta = estimate(history, active, stale) if active and settings_data["show_eta"] else {}
+    pellet_status = (pellet_calibration.health(latest["pellet_raw"]) if latest and latest["pellet_raw"] is not None
+                     else "unavailable" if not latest or latest["pellets"] is None else "legacy")
+    hopper_hours = hopper_trend.estimate(rows) if latest and latest["pellets"] is not None and not stale else None
     sample_seconds = settings_data["sample_seconds"]
     elapsed = max(0, (datetime.now() - datetime.fromisoformat(latest["time"])).total_seconds()) if latest else None
     next_sample_in = max(0, sample_seconds - elapsed) if elapsed is not None else None
@@ -238,7 +290,8 @@ def api_readings():
                     "sample_seconds": sample_seconds, "next_sample_in": next_sample_in,
                     "temperature_unit": settings_data["temperature_unit"],
                     "gauge_ticks": settings_data["gauge_ticks"],
-                    "show_eta": settings_data["show_eta"], "eta": eta})
+                    "show_eta": settings_data["show_eta"], "eta": eta,
+                    "pellet_status": pellet_status, "hopper_hours": hopper_hours})
 
 
 @app.route("/")
@@ -250,7 +303,7 @@ def index():
 def api_pellet_sensor():
     raw = pellet_calibration.current_raw()
     level = pellet_calibration.percent(raw) if raw is not None else None
-    return jsonify({"raw": raw, "percent": level})
+    return jsonify({"raw": raw, "percent": level, "status": pellet_calibration.health(raw)})
 
 
 @app.route("/settings", methods=["GET", "POST"])
@@ -345,6 +398,8 @@ def cooks():
                 cook_presets.start_session(after)
             elif action == "edit":
                 cook_presets.update_session_preset(before, after)
+            elif before and not after:
+                cook_presets.end_session()
             return redirect(url_for("cooks", result="saved"))
         except (cook_presets.BadPreset, cook_presets.Conflict, ValueError, KeyError) as exc:
             return redirect(url_for("cooks", result="error", reason=str(exc)))
@@ -353,6 +408,67 @@ def cooks():
                            active=cook_presets.active_cook(), csrf=csrf_token(),
                            result=request.args.get("result", ""),
                            reason=request.args.get("reason", ""))
+
+
+@app.route("/cooks/history")
+def cook_history():
+    return render_template("cook_history.html", records=cook_presets.list_sessions(cook_presets.active_cook()))
+
+
+@app.route("/cooks/history/<identifier>")
+def cook_history_detail(identifier):
+    record = selected_session(identifier)
+    return render_template("cook_history_detail.html", record=record)
+
+
+@app.route("/api/cooks/history/<identifier>")
+def cook_history_data(identifier):
+    record = selected_session(identifier)
+    rows = session_readings(record)
+    if len(rows) > 600:
+        step = (len(rows) + 598) // 599
+        rows = rows[::step] + ([rows[-1]] if rows[-1] != rows[::step][-1] else [])
+    return jsonify({"rows": rows, "temperature_unit": update_settings.load()["temperature_unit"]})
+
+
+@app.route("/cooks/history/<identifier>/download")
+def cook_history_download(identifier):
+    record = selected_session(identifier)
+    def generate():
+        yield "time,grill_F,pellets_percent,wifi,probe1_F,probe2_F,probe1_target_F,probe2_target_F,grill_target_F,pi_temp_F,pellet_raw\n"
+        for _, fields in session_lines(record):
+            yield ",".join(fields[:11] + ([""] if len(fields) == 10 else [])) + "\n"
+    name = "cook-{}-{}.csv".format(record["started_at"][:10], identifier[:8])
+    return Response(generate(), mimetype="text/csv", headers={"Content-Disposition": 'attachment; filename="{}"'.format(name)})
+
+
+@app.route("/settings/backup")
+def settings_backup():
+    if not safe_credential_form():
+        abort(403)
+    archive, size = backup_export.create()
+    response = send_file(archive, mimetype="application/zip", as_attachment=True,
+                         download_name="pellet-grill-backup-{}.zip".format(datetime.now().strftime("%Y%m%d-%H%M")))
+    response.call_on_close(archive.close)
+    response.headers["Content-Length"] = str(size)
+    return response
+
+
+@app.route("/notifications/snooze", methods=["POST"])
+def snooze_notifications():
+    check_csrf()
+    if not safe_credential_form():
+        abort(403)
+    try:
+        minutes = 0 if request.form.get("action") == "resume" else int(request.form.get("minutes", ""))
+    except ValueError:
+        abort(400)
+    if minutes not in (0, 30, 60, 240):
+        abort(400)
+    settings = alert_settings()
+    settings["snooze_until"] = (datetime.now() + timedelta(minutes=minutes)).isoformat(timespec="seconds") if minutes else None
+    save_alert_settings(settings)
+    return redirect(url_for("notifications", result="snoozed" if minutes else "resumed"))
 
 
 @app.route("/notifications", methods=["GET", "POST"])
@@ -367,6 +483,7 @@ def notifications():
             if not configured:
                 return redirect(url_for("notifications", result="missing"))
             ok = send_message("Traeger Grill Monitor test notification. No grill action was taken.")
+            alert_delivery.record("Test notification", ok)
             return redirect(url_for("notifications", result="sent" if ok else "failed"))
         if action == "save_alerts":
             if not secure_form:
@@ -389,8 +506,8 @@ def notifications():
                     5 <= thresholds["deviation_percent"] <= 40):
                 return redirect(url_for("notifications", result="invalid_alerts"))
             toggles = ("enabled", "grill_reached", "probe1_reached", "probe2_reached",
-                       "grill_deviation", "pellet_low", "pi_hot")
-            settings = dict(thresholds, **{key: key in request.form for key in toggles})
+                       "grill_deviation", "pellet_low", "pi_hot", "emergency_grill", "emergency_pellets")
+            settings = dict(alert_settings(), **thresholds, **{key: key in request.form for key in toggles})
             save_alert_settings(settings)
             return redirect(url_for("notifications", result="alerts_saved"))
         if action != "save":
@@ -403,9 +520,15 @@ def notifications():
             return redirect(url_for("notifications", result="invalid"))
         save_credentials(token, user)
         return redirect(url_for("notifications", result="saved"))
+    current_alerts = alert_settings()
+    try:
+        snoozed = datetime.now() < datetime.fromisoformat(current_alerts.get("snooze_until") or "")
+    except ValueError:
+        snoozed = False
     return render_template("notifications.html", configured=configured,
                            secure_form=secure_form, result=request.args.get("result", ""),
-                           csrf=csrf_token(), settings=alert_settings())
+                           csrf=csrf_token(), settings=current_alerts, snoozed=snoozed,
+                           delivery=alert_delivery.load())
 
 
 if __name__ == "__main__":

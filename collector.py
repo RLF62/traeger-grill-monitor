@@ -75,7 +75,7 @@ def sample(device=None, active_path=ACTIVE):
     raw = read_channels(device or find_adc())
     cook = cook_presets.active_cook(active_path)
     return dict(time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                grill=thermistor_f(raw[0]), pellets=pellet_percent(raw[3]),
+                grill=thermistor_f(raw[0]), pellets=pellet_percent(raw[3]), pellet_raw=round(raw[3]),
                 wifi=wifi_signal(), probe1=thermistor_f(raw[1]),
                 probe2=thermistor_f(raw[2]), probe1_target=cook["probe1"] if cook else None,
                 probe2_target=cook["probe2"] if cook else None,
@@ -84,8 +84,8 @@ def sample(device=None, active_path=ACTIVE):
 
 def csv_line(row):
     fields = ("time", "grill", "pellets", "wifi", "probe1", "probe2",
-              "probe1_target", "probe2_target", "grill_target", "pi_temp")
-    return ",".join("" if row[key] is None else str(row[key]) for key in fields) + "\n"
+              "probe1_target", "probe2_target", "grill_target", "pi_temp", "pellet_raw")
+    return ",".join("" if row.get(key) is None else str(row[key]) for key in fields) + "\n"
 
 
 def append(row, path=READINGS):

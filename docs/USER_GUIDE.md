@@ -11,6 +11,7 @@ The dashboard shows the grill, two probes, pellet hopper, Pi temperature and Wi-
 - Click a gauge ring to change its color and the matching chart trace. Click the colored line in the pellet hopper box to change its trace color.
 - Hover a chart line, or tap near it, for the time, sensor name and value. Click a legend item to hide or show that trace. Pellet level has its own percentage scale.
 - The active cook appears on the front page. Activating a preset starts a fresh chart session; older readings remain stored.
+- The pellet box warns when the raw sensor signal falls outside its calibrated range. A steady downward trend can show an approximate number of hours of pellets remaining; a changing or short trend shows no estimate.
 - Estimated time to target appears below each gauge when the current cook has a target and recent readings show a rising trend. The estimate recalculates with every new sensor sample and may change substantially during warmup. A moved probe begins a new trend; cooling or steady readings show “calculating” until there is a useful rise. A missing probe shows no estimate.
 
 ## Cook Presets
@@ -18,6 +19,8 @@ The dashboard shows the grill, two probes, pellet hopper, Pi temperature and Wi-
 ![Saved cook targets](images/cooks.png)
 
 Open **Cook Presets** to save grill, Probe 1 and Probe 2 targets and a descriptive name. Leave a probe blank when unused. Edit or delete presets as recipes change. Activate one for the current cook; only one is active at a time. Stop the cook or activate another to end its current chart session. Verify safe food temperatures independently.
+
+Select **View saved cook history** to reopen a session chart or download its complete CSV. The chart uses the selected °F or °C display preference. The CSV retains the original Fahrenheit sensor values and raw pellet counts. Sessions are saved when you start a preset and closed when you end or restart it; older samples remain in the same data file.
 
 ## Settings
 
@@ -35,9 +38,13 @@ On installations with the optional RGB status LED, the brightness slider control
 
 In **Update from GitHub**, select **Check for updates** to compare installed and available versions. If a newer release appears, select **Install update** and refresh this page after the services restart. Saved settings, readings, and cook presets remain in place.
 
+In **Download your grill data**, save a backup ZIP before changing SD cards or reinstalling. It contains readings, cook presets and history, calibration, update preferences, and alert settings. Pushover keys and session secrets are excluded, so configure Pushover separately on a replacement card.
+
 ## Notifications
 
 Open **Notifications** to save a Pushover application token and user key, select individual alerts, and send a test message. The worker continues when the browser is closed. Credentials stay in the Pi's Git-ignored `private/` directory. Check alert thresholds and test delivery before relying on them.
+
+You can snooze routine alerts for 30 minutes, 1 hour, or 4 hours and resume them early. Optional repeating alerts for grill deviation or low pellets use Pushover emergency priority and repeat every minute for up to 30 minutes until acknowledged. These urgent alerts still send during a routine snooze. **Delivery status** shows the last send attempt and whether Pushover accepted it. Alerts are disabled until you turn them on.
 
 ### Traeger notification icon
 

@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cook History · {{ page_name }}</title><link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}"><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>{{ page_name }}</strong><small>Cook history</small></div></header>
+<main><nav><a href="{{ url_for('index') }}">Dashboard</a><a href="{{ url_for('cooks') }}">Cook Presets</a><a href="{{ url_for('settings') }}">Settings</a><a href="{{ url_for('notifications') }}">Notifications</a></nav>
+<section class="card"><p class="eyebrow">COOK HISTORY</p><h1>Saved cook sessions</h1>
+<p class="note">Each started cook keeps its own chart. Recorded sensor readings remain in the CSV file.</p>
+{% if records %}<div class="history-list">{% for row in records %}
+<article><div><strong>{{ row.name }}</strong><p>Started {{ row.started_at.replace('T',' ') }} · {{ 'Ended ' ~ row.ended_at.replace('T',' ') if row.ended_at else 'In progress' }}</p><small>Grill {{ display_temp(row.grill) }}°{{ temperature_unit }}{% if row.probe1 %} · Probe 1 {{ display_temp(row.probe1) }}°{{ temperature_unit }}{% endif %}{% if row.probe2 %} · Probe 2 {{ display_temp(row.probe2) }}°{{ temperature_unit }}{% endif %}</small></div><div class="history-actions"><a href="{{ url_for('cook_history_detail', identifier=row.id) }}">View chart</a><a href="{{ url_for('cook_history_download', identifier=row.id) }}">Download CSV</a></div></article>
+{% endfor %}</div>{% else %}<p>No cook sessions saved yet. Starting a preset will create one.</p>{% endif %}
+</section></main></body></html>

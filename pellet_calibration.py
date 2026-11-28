@@ -47,12 +47,20 @@ def save(empty_raw, full_raw):
 
 def percent(raw, settings=None):
     settings = settings or load()
-    empty, full = settings["empty_raw"], settings["full_raw"]
-    # With the usual rising signal, near-ground readings far below the
-    # calibrated empty point indicate a missing sensor signal.
-    if full > empty and raw < min(1000, empty * 0.2):
+    if health(raw, settings) != "ok":
         return None
+    empty, full = settings["empty_raw"], settings["full_raw"]
     return max(0, min(100, int((raw - empty) / (full - empty) * 100)))
+
+
+def health(raw, settings=None):
+    """Distinguish an empty hopper from an absent or uncalibrated signal."""
+    if raw is None:
+        return "unavailable"
+    settings = settings or load()
+    empty, full = settings["empty_raw"], settings["full_raw"]
+    tolerance = max(500, abs(full - empty) * 0.10)
+    return "ok" if min(empty, full) - tolerance <= raw <= max(empty, full) + tolerance else "out_of_range"
 
 
 def current_raw(root=Path("/sys/bus/iio/devices")):

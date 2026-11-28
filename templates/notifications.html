@@ -17,6 +17,8 @@
     {% if result == 'failed' %}<p class="banner bad">Test failed. Check the Pushover keys and application log.</p>{% endif %}
     {% if result == 'invalid' %}<p class="banner bad">Enter valid Pushover keys (30 letters or numbers each).</p>{% endif %}
     {% if result == 'alerts_saved' %}<p class="banner good">Alert settings saved.</p>{% endif %}
+    {% if result == 'snoozed' %}<p class="banner good">Routine alerts snoozed.</p>{% endif %}
+    {% if result == 'resumed' %}<p class="banner good">Routine alerts resumed.</p>{% endif %}
     {% if result == 'invalid_alerts' %}<p class="banner bad">Check the threshold ranges below.</p>{% endif %}
     {% if result == 'missing' %}<p class="banner bad">Set up Pushover before sending a test.</p>{% endif %}
     <p class="note">{{ 'Pushover is configured. Saved keys are never shown.' if configured else 'Pushover has not been set up for this monitor. Add your Traeger application token and user key below.' }}</p>
@@ -43,6 +45,7 @@
   <section class="card history">
     <h2>Cooking alerts</h2>
     <p class="note">Alerts follow new temperature readings. They are off until you enable them here. The original app's alerts run separately.</p>
+    <p class="note">{% if settings.enabled %}Automatic alerts are enabled.{% else %}Automatic alerts are off.{% endif %} {% if snoozed %}Routine alerts are snoozed until {{ settings.snooze_until.replace('T',' ') }}.{% endif %}</p>
     <form method="post">
       <input type="hidden" name="csrf" value="{{ csrf }}">
       <label class="check"><input type="checkbox" name="enabled" {% if settings.enabled %}checked{% endif %} {% if not configured or not secure_form %}disabled{% endif %}> Enable automatic Pushover alerts</label>
@@ -56,8 +59,19 @@
         <label>Pi temperature high (°{{ temperature_unit }})<input name="pi_threshold" type="number" min="{{ 49 if temperature_unit == 'C' else 120 }}" max="{{ 104 if temperature_unit == 'C' else 220 }}" value="{{ display_temp(settings.pi_threshold) }}" {% if not secure_form %}disabled{% endif %}></label>
         <label>Grill deviation (%)<input name="deviation_percent" type="number" min="5" max="40" value="{{ settings.deviation_percent }}" {% if not secure_form %}disabled{% endif %}></label>
       </div>
+      <label class="check"><input type="checkbox" name="emergency_grill" {% if settings.emergency_grill %}checked{% endif %} {% if not secure_form %}disabled{% endif %}> Repeat grill deviation alerts until acknowledged</label>
+      <label class="check"><input type="checkbox" name="emergency_pellets" {% if settings.emergency_pellets %}checked{% endif %} {% if not secure_form %}disabled{% endif %}> Repeat low pellet alerts until acknowledged</label>
+      <p class="note">These optional emergency Pushover alerts repeat every minute for up to 30 minutes, unless acknowledged. They still send while routine alerts are snoozed.</p>
       <button name="action" value="save_alerts" {% if not secure_form %}disabled{% endif %}>Save alert settings</button>
     </form>
+    <form method="post" action="{{ url_for('snooze_notifications') }}"><input type="hidden" name="csrf" value="{{ csrf }}">
+      <label>Snooze routine alerts<select name="minutes"><option value="30">30 minutes</option><option value="60">1 hour</option><option value="240">4 hours</option></select></label>
+      <button {% if not settings.enabled or not secure_form %}disabled{% endif %}>Snooze</button>
+      {% if snoozed %}<button class="secondary" name="action" value="resume">Resume now</button>{% endif %}
+    </form>
+    <h3>Delivery status</h3>
+    {% if delivery.time %}<p class="{{ 'banner good' if delivery.success else 'banner bad' }}" role="status">Last attempt {{ delivery.time.replace('T',' ') }}: {{ 'Pushover accepted the alert' if delivery.success else 'Delivery failed' }}{% if delivery.emergency %} (repeating until acknowledged){% endif %}. {{ delivery.message }}</p><p class="note">Accepted alerts since status tracking began: {{ delivery.sent_count }}.</p>
+    {% else %}<p class="note">No notification attempts recorded yet.</p>{% endif %}
     <p class="note">The new worker sends alerts when a reading crosses a threshold. It does not replay old readings when started.</p>
   </section>
 </main>

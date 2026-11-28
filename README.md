@@ -8,6 +8,14 @@ A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and
 
 ## Settings
 
+The dashboard flags a pellet reading outside the saved calibration range instead of presenting it as an empty hopper. When the hopper level has declined steadily for long enough, it also estimates hours of pellets remaining. The estimate disappears when the sensor is unavailable or the trend is unreliable.
+
+**Cook Presets → View saved cook history** opens past sessions and lets you download each session's original readings as CSV. New sessions are saved when a cook starts and closed when it ends or restarts.
+
+In **Notifications**, routine alerts can be snoozed for 30 minutes, 1 hour, or 4 hours. Optional repeating Pushover alerts for grill deviation or low pellets continue until acknowledged or 30 minutes pass. Delivery status shows the last accepted or failed attempt. Automatic alerts remain off until explicitly enabled.
+
+In **Settings → Backup**, download a ZIP of readings, saved cooks and cook history, calibration, and app preferences. It excludes Pushover credentials and session secrets; keep those separately when moving to another Pi.
+
 ![General Settings with page name, update intervals, gauges, and RGB LED brightness](docs/images/settings-general.png)
 
 ![Pellet sensor calibration with live readings and empty/full capture](docs/images/settings-pellet-calibration.png)

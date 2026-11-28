@@ -10,6 +10,9 @@ DEFAULTS = {
     "pellet_threshold": 20,
     "pi_threshold": 180,
     "deviation_percent": 15,
+    "emergency_grill": False,
+    "emergency_pellets": False,
+    "snooze_until": None,
 }
 
 
