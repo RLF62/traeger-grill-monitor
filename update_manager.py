@@ -112,6 +112,7 @@ def install():
     owner = pwd.getpwuid(BASE.stat().st_uid).pw_name
     write_state("running", "Checking GitHub and installing the update.")
     previous = None
+    services = SERVICES + (("traeger-led.service",) if Path("/etc/systemd/system/traeger-led.service").exists() else ())
     try:
         result = check(fetch=True, user=owner)
         if result["blocked"]:
@@ -127,9 +128,9 @@ def install():
                 raise UpdateError("Python requirements changed on a legacy install. Update dependencies manually before installing this release.")
             command([str(python), "-m", "pip", "install", "-r", str(BASE / "requirements.txt")],
                     user=owner, timeout=180)
-        for service in SERVICES:
+        for service in services:
             command(["systemctl", "restart", service], timeout=25)
-        for service in SERVICES:
+        for service in services:
             if command(["systemctl", "is-active", service]) != "active":
                 raise UpdateError(service + " did not start.")
         write_state("success", "Installed version " + version_at("HEAD", user=owner) + ".")
@@ -137,7 +138,7 @@ def install():
         if previous:
             try:
                 git("reset", "--hard", previous, user=owner)
-                for service in SERVICES:
+                for service in services:
                     command(["systemctl", "restart", service], timeout=25)
                 write_state("failed", str(exc) + " Previous code restored.")
             except UpdateError as rollback:

@@ -10,7 +10,7 @@ A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and
 
 ![Traeger Settings page with page name, intervals, gauge options, and GitHub updates](docs/images/settings-current.png)
 
-Open **Settings** to change the page name shown in every header and browser tab, adjust the sensor sampling and dashboard refresh intervals, and switch gauge tick marks or time-to-target estimates on or off. The **Update from GitHub** section shows installed and available release versions. Choose **Check for updates**, then **Install update** when a new release is available. The dashboard may briefly disconnect while services restart; saved cooks, readings, and preferences remain in place.
+Open **Settings** to change the page name shown in every header and browser tab, adjust the sensor sampling and dashboard refresh intervals, and switch gauge tick marks or time-to-target estimates on or off. On Pis fitted with the optional RGB status LED, Settings also has a brightness slider. Blue means connecting, green means Wi-Fi connected, and red means disconnected. The **Update from GitHub** section shows installed and available release versions. Choose **Check for updates**, then **Install update** when a new release is available. The dashboard may briefly disconnect while services restart; saved cooks, readings, and preferences remain in place.
 
 ## Estimated time to target
 
@@ -28,7 +28,7 @@ On **Raspberry Pi OS Lite 32-bit (Trixie 13 or newer)** with Python 3.12+ and ma
 sudo apt update && sudo apt install -y git && git clone https://github.com/RLF62/pellet-grill-monitor.git && sudo bash pellet-grill-monitor/install.sh --port-80
 ```
 
-Open the URL printed at the end. Reboot first if the installer enables the ADC overlay. Omit `--port-80` to use port 8081 only. The bundled Apache config allows the `192.168.1.0/24` trusted LAN; review it for another subnet. The installer stops if an older PHP monitor or new service already exists. See [installation and hardware](docs/INSTALL.md) for details. The source repository is public. The dashboard itself is intended for the trusted LAN and has no public Internet login.
+Open the URL printed at the end. Reboot first if the installer enables the ADC overlay. Omit `--port-80` to use port 8081 only. Add `--rgb-led` for a common-cathode LED wired red GPIO 17, green GPIO 27 and blue GPIO 22; it enables a brightness slider and may require a reboot. The bundled Apache config allows the `192.168.1.0/24` trusted LAN; review it for another subnet. The installer stops if an older PHP monitor or new service already exists. See [installation and hardware](docs/INSTALL.md) for details. The source repository is public. The dashboard itself is intended for the trusted LAN and has no public Internet login.
 
 ## Screens
 
@@ -37,7 +37,7 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 | Dashboard | Gauges with target marks and optional time-to-target estimates, Wi-Fi name, pellet level, matching trace colors, hover values and clickable legend. |
 | Cook Presets | Save targets, activate a cook and start a fresh chart session without deleting old readings. |
 | Notifications | Configure Pushover keys and individual alerts. |
-| Settings | Change the page name, set sensor and browser update intervals, toggle gauge tick marks and time-to-target estimates, and check GitHub for software updates. |
+| Settings | Change the page name, set sensor and browser update intervals, toggle gauge tick marks and time-to-target estimates, adjust an optional RGB status LED, and check GitHub for software updates. |
 
 Read the illustrated [user guide](docs/USER_GUIDE.md). Estimates update with each new sensor sample. A gauge shows “calculating” until a rising trend is available, and the estimate may move as the grill or probe temperature changes.
 

@@ -6,7 +6,7 @@ from pathlib import Path
 
 CONFIG = Path(__file__).resolve().parent / "private" / "update-settings.json"
 DEFAULT = {"sample_seconds": 60, "refresh_seconds": 15, "gauge_ticks": False,
-           "show_eta": True, "page_name": "Traeger Grill Monitor"}
+           "show_eta": True, "page_name": "Traeger Grill Monitor", "led_brightness": 25}
 
 
 def load():
@@ -14,27 +14,30 @@ def load():
         data = json.loads(CONFIG.read_text())
         result = dict(DEFAULT, **data) if isinstance(data, dict) else dict(DEFAULT)
         return validate(result["sample_seconds"], result["refresh_seconds"], result["gauge_ticks"],
-                        result["show_eta"], result["page_name"])
+                        result["show_eta"], result["page_name"], result["led_brightness"])
     except (OSError, ValueError, TypeError, KeyError):
         return dict(DEFAULT)
 
 
-def validate(sample, refresh, gauge_ticks=False, show_eta=True, page_name="Traeger Grill Monitor"):
+def validate(sample, refresh, gauge_ticks=False, show_eta=True, page_name="Traeger Grill Monitor", led_brightness=25):
     if not isinstance(show_eta, bool):
         raise ValueError("Time to target setting must be on or off.")
     if not isinstance(gauge_ticks, bool):
         raise ValueError("Gauge tick setting must be on or off.")
-    sample, refresh = int(sample), int(refresh)
+    sample, refresh, led_brightness = int(sample), int(refresh), int(led_brightness)
+    if not 0 <= led_brightness <= 100:
+        raise ValueError("LED brightness must be 0-100 percent.")
     if not 10 <= sample <= 300 or not 2 <= refresh <= 60:
         raise ValueError("Sample interval must be 10–300 seconds and dashboard interval 2–60 seconds.")
     if not isinstance(page_name, str) or not (1 <= len(page_name.strip()) <= 60) or any(ord(c) < 32 for c in page_name):
         raise ValueError("Page name must be 1-60 characters without control characters.")
     return {"sample_seconds": sample, "refresh_seconds": refresh, "gauge_ticks": gauge_ticks,
-            "show_eta": show_eta, "page_name": page_name.strip()}
+            "show_eta": show_eta, "page_name": page_name.strip(),
+            "led_brightness": led_brightness}
 
 
-def save(sample, refresh, gauge_ticks=False, show_eta=True, page_name="Traeger Grill Monitor"):
-    data = validate(sample, refresh, gauge_ticks, show_eta, page_name)
+def save(sample, refresh, gauge_ticks=False, show_eta=True, page_name="Traeger Grill Monitor", led_brightness=25):
+    data = validate(sample, refresh, gauge_ticks, show_eta, page_name, led_brightness)
     fd, temp = tempfile.mkstemp(prefix=".update-", dir=str(CONFIG.parent))
     try:
         os.fchmod(fd, 0o600)

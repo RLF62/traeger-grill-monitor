@@ -1,0 +1,14 @@
+[Unit]
+Description=Traeger RGB Wi-Fi status LED
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/pi/traeger-grill-monitor
+ExecStart=/usr/bin/python3 /home/pi/traeger-grill-monitor/led_status.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -245,11 +245,13 @@ def settings():
                                  request.form.get("refresh_seconds", ""),
                                  request.form.get("gauge_ticks") == "on",
                                  request.form.get("show_eta") == "on",
-                                 request.form.get("page_name", ""))
+                                 request.form.get("page_name", ""),
+                                 request.form.get("led_brightness", update_settings.load()["led_brightness"]))
             return redirect(url_for("settings", result="saved"))
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
     return render_template("settings.html", intervals=update_settings.load(),
+                           rgb_led_available=Path("/etc/systemd/system/traeger-led.service").exists(),
                            csrf=csrf_token(), result=request.args.get("result", ""),
                            update=update_manager.status(),
                            update_error=session.pop("update_error", ""))

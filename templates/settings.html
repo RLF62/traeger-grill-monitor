@@ -20,8 +20,14 @@
 <p class="note">Small marks every 10°F and longer marks every 50°F. Target markers remain visible.</p>
 <label class="check"><input name="show_eta" type="checkbox" {% if intervals.show_eta %}checked{% endif %}> Show estimated time to target</label>
 <p class="note">Shown below each gauge when a cook target and a steady rising trend provide enough data. Estimates change as the cook progresses.</p>
+{% if rgb_led_available %}
+<label>RGB status LED brightness <output id="led-brightness-value">{{ intervals.led_brightness }}%</output>
+<input name="led_brightness" type="range" min="0" max="100" step="5" value="{{ intervals.led_brightness }}" id="led-brightness-slider"></label>
+<p class="note">Green means Wi-Fi connected, blue means connecting, and red means disconnected. At 0%, the LED is off. Changes apply within a few seconds.</p>
+{% endif %}
 <button name="action" value="save">Save update settings</button>
 </form></section>
+{% if rgb_led_available %}<script src="{{ url_for('static', filename='led-brightness.js') }}" defer></script>{% endif %}
 <section class="card"><p class="eyebrow">SOFTWARE UPDATES</p><h2>Update from GitHub</h2>
 <p>Installed version: <strong>{{ update.installed_version }}</strong><br>Available version: <strong>{{ update.available_version }}</strong></p>
 {% if result == 'checked' %}<p class="banner good" role="status">GitHub check completed.</p>{% endif %}

@@ -3,15 +3,17 @@
 set -euo pipefail
 
 usage() {
-  echo 'Usage: sudo bash install.sh [--port-80] [--check]'
+  echo 'Usage: sudo bash install.sh [--port-80] [--rgb-led] [--check]'
   echo 'Clone the public repository first as the regular Pi user.'
 }
 PORT80=0
 CHECK=0
+RGB_LED=0
 for arg in "$@"; do
   case "$arg" in
     --port-80) PORT80=1 ;;
     --check) CHECK=1 ;;
+    --rgb-led) RGB_LED=1 ;;
     --help|-h) usage; exit 0 ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -42,6 +44,7 @@ if [[ $CHECK == 1 ]]; then
   echo "Operating system: ${PRETTY_NAME}; $(python3 --version)"
   echo "User: $APP_USER; install folder: $APP_DIR; ADS1115 channels: $([[ $ADC_READY == 1 ]] && echo ready || echo 'need boot overlay and reboot')"
   echo "Dashboard: port 8081$([[ $PORT80 == 1 ]] && echo ' with Apache on port 80')"
+  [[ $RGB_LED == 0 ]] || echo "Optional RGB LED: GPIO 17 red, 27 green, 22 blue"
   exit 0
 fi
 [[ $EUID == 0 ]] || { echo 'Run as sudo bash install.sh.' >&2; exit 1; }
@@ -108,6 +111,9 @@ for name in ('traeger-collector','traeger-monitor','traeger-notifications'):
 PY
 systemctl daemon-reload
   bash "$APP_DIR/deploy/install-updater.sh"
+if [[ $RGB_LED == 1 ]]; then
+  bash "$APP_DIR/deploy/install-rgb-led.sh"
+fi
 systemctl enable --now traeger-monitor.service traeger-notifications.service
 if [[ $REBOOT == 0 ]]; then
   systemctl enable --now traeger-collector.service
