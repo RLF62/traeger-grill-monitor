@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shut down Pi · {{ page_name }}</title><link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}"><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>{{ page_name }}</strong><small>Safe shutdown</small></div></header>
+<main><section class="card power-card"><p class="eyebrow">POWER</p><h1>Shut down the Pi?</h1>
+<p>The monitor will stop collecting readings and sending alerts until you turn the Pi back on. The grill itself is not controlled by this button.</p>
+{% if error %}<p class="banner bad" role="alert">{{ error }}</p>{% endif %}
+<form method="post" action="{{ url_for('shutdown_pi') }}"><input type="hidden" name="csrf" value="{{ csrf }}">
+<button type="submit">Yes, shut down safely</button> <a class="secondary-link" href="{{ url_for('settings') }}">Cancel</a>
+</form></section></main></body></html>

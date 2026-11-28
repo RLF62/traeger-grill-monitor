@@ -1,0 +1,7 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shutting down · {{ page_name }}</title><link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}"><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>{{ page_name }}</strong><small>Safe shutdown</small></div></header>
+<main><section class="card power-card" role="status" aria-live="polite"><p class="eyebrow">POWER</p><h1>Shutting down the Pi…</h1>
+<p>Stopping the monitor and writing saved data to the SD card. This page will stop responding.</p>
+<div class="shutdown-track" aria-hidden="true"><span></span></div>
+<p>Wait at least 30 seconds and for the Pi's activity to stop before unplugging it. The grill itself is not affected.</p></section></main></body></html>

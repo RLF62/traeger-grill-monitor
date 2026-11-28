@@ -118,10 +118,16 @@ def install():
         if result["blocked"]:
             raise UpdateError(result["reason"])
         if not result["update_available"]:
+            helper = BASE / "deploy" / "install-shutdown.sh"
+            if helper.is_file():
+                command(["bash", str(helper)], timeout=20)
             write_state("current", "Already on the latest GitHub version.")
             return
         previous = git("rev-parse", "HEAD", user=owner)
         git("merge", "--ff-only", "origin/main", user=owner)
+        helper = BASE / "deploy" / "install-shutdown.sh"
+        if helper.is_file():
+            command(["bash", str(helper)], timeout=20)
         if git("diff", "--name-only", previous, "HEAD", "--", "requirements.txt", user=owner):
             python = BASE / ".venv" / "bin" / "python"
             if not python.exists():

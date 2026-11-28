@@ -24,6 +24,7 @@ import backup_export
 import alert_delivery
 import hopper_trend
 import cook_notification
+import shutdown_manager
 from eta import estimate
 
 BASE = Path(__file__).resolve().parent
@@ -352,9 +353,24 @@ def settings():
                            pellet_calibration=calibration, pellet_raw=raw,
                            pellet_percent=pellet_calibration.percent(raw, calibration) if raw is not None else None,
                            rgb_led_available=Path("/etc/systemd/system/traeger-led.service").exists(),
+                           shutdown_available=shutdown_manager.available(),
                            csrf=csrf_token(), result=request.args.get("result", ""),
                            update=update_manager.status(),
                            update_error=session.pop("update_error", ""))
+
+
+@app.route("/settings/shutdown", methods=["GET", "POST"])
+def shutdown_pi():
+    if not safe_credential_form():
+        abort(403)
+    if request.method == "POST":
+        check_csrf()
+        try:
+            shutdown_manager.start()
+        except shutdown_manager.ShutdownError as exc:
+            return render_template("confirm_shutdown.html", csrf=csrf_token(), error=str(exc)), 503
+        return render_template("shutting_down.html")
+    return render_template("confirm_shutdown.html", csrf=csrf_token(), error=None)
 
 
 @app.route("/settings/pellet-calibration", methods=["POST"])

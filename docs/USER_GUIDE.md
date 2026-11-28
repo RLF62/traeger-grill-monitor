@@ -40,6 +40,8 @@ In **Update from GitHub**, select **Check for updates** to compare installed and
 
 In **Download your grill data**, save a backup ZIP before changing SD cards or reinstalling. It contains readings, cook presets and history, calibration, update preferences, and alert settings. Pushover keys and session secrets are excluded, so configure Pushover separately on a replacement card.
 
+At the bottom of **Settings**, choose **Shut down Pi…**, review the confirmation, then choose **Yes, shut down safely**. The screen displays shutdown in progress while the Pi stops its services and writes data to the SD card. Wait at least 30 seconds and for the Pi activity to stop before removing power. The button does not control the grill. Power the Pi back on to resume readings and alerts. The shutdown service is limited to this one action and is installed by the fresh installer or web updater.
+
 ## Notifications
 
 Open **Notifications** to save a Pushover application token and user key, select individual alerts, and send a test message. When **Notify when a new cook starts** and the main alert switch are enabled, activating a preset sends its name and the latest grill temperature, pellet level, and Wi-Fi signal. Readings older than three minutes are shown as unavailable. A routine snooze also pauses cook start messages. The worker continues when the browser is closed. Credentials stay in the Pi's Git-ignored `private/` directory. Check alert thresholds and test delivery before relying on them.

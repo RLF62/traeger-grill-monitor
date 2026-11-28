@@ -157,3 +157,12 @@ select { display:block; width:min(100%,480px); padding:11px; border-radius:8px; 
 .history-list small { color:#aab7c0; }
 .history-actions { display:flex; flex-wrap:wrap; gap:16px; }
 .metrics .sensor-warning { color:#ffbc73; line-height:1.4; }
+.power-card { max-width:650px; }
+.power-button, .secondary-link { display:inline-block; padding:10px 15px; border-radius:7px; text-decoration:none; color:#fff; }
+.power-button { border:1px solid #c76934; background:#9d4e26; }
+.power-button:hover, .power-button:focus-visible { background:#b85e2c; }
+.secondary-link { border:1px solid #60707c; background:#303943; }
+.shutdown-track { height:10px; border-radius:99px; overflow:hidden; background:#39444d; margin:22px 0; }
+.shutdown-track span { display:block; width:36%; height:100%; border-radius:99px; background:#ffad48; animation:shutdown-progress 2s ease-in-out infinite alternate; }
+@keyframes shutdown-progress { from { transform:translateX(-90%); } to { transform:translateX(280%); } }
+@media(prefers-reduced-motion:reduce) { .shutdown-track span { animation:none; width:100%; } }

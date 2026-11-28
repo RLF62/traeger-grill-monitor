@@ -53,6 +53,7 @@ Back up old PHP code, the old crontab, `data.txt`, `Cooking_Times.txt` and `Cook
 | `traeger-collector.service` | Sensor sampling to `data/readings.csv` |
 | `traeger-monitor.service` | Gunicorn dashboard on port 8081 |
 | `traeger-notifications.service` | Pushover alert evaluation |
+| `traeger-shutdown.service` | Delayed clean Pi shutdown after confirmation in Settings |
 | `private/update-settings.json` | Update intervals |
 | `private/pushover.json` | Local secret keys; never commit |
 | `data/Cooking_Times.txt`, `data/Cooking_Times.tmp` | Saved cook targets |

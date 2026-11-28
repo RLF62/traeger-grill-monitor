@@ -111,6 +111,7 @@ for name in ('traeger-collector','traeger-monitor','traeger-notifications'):
 PY
 systemctl daemon-reload
   bash "$APP_DIR/deploy/install-updater.sh"
+  bash "$APP_DIR/deploy/install-shutdown.sh"
 if [[ $RGB_LED == 1 ]]; then
   bash "$APP_DIR/deploy/install-rgb-led.sh"
 fi

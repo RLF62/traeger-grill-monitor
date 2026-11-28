@@ -16,6 +16,8 @@ In **Notifications**, a new cook can send its name, current grill temperature, p
 
 In **Settings → Backup**, download a ZIP of readings, saved cooks and cook history, calibration, and app preferences. It excludes Pushover credentials and session secrets; keep those separately when moving to another Pi.
 
+At the bottom of Settings, **Shut down Pi…** opens a confirmation screen. After confirmation, a shutdown screen appears while the Pi safely powers off. Wait at least 30 seconds and for Pi activity to stop before unplugging it. This affects the monitor Pi, not the grill.
+
 ![General Settings with page name, update intervals, gauges, and RGB LED brightness](docs/images/settings-general.png)
 
 ![Pellet sensor calibration with live readings and empty/full capture](docs/images/settings-pellet-calibration.png)

@@ -67,4 +67,9 @@
 <button name="action" value="check">Check for updates</button>
 {% if update.update_available and not update.blocked and update.phase != 'running' %}<button name="action" value="install">Install update</button>{% endif %}
 </form><p class="note">The monitor may be briefly unavailable while its services restart. Saved readings and settings stay in place.</p>
+</section>
+<section class="card power-card"><p class="eyebrow">POWER</p><h2>Shut down the Pi</h2>
+<p class="note">Use this before disconnecting power. Readings and alerts stop until you turn the Pi back on. It does not turn off the grill.</p>
+{% if shutdown_available %}<a class="power-button" href="{{ url_for('shutdown_pi') }}">Shut down Pi…</a>
+{% else %}<p class="note">Shutdown control is being set up. Reload Settings shortly.</p>{% endif %}
 </section></main></body></html>
