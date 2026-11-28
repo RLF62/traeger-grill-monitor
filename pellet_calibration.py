@@ -1,6 +1,7 @@
 """Per-installation calibration for the ADS1115 pellet sensor."""
 import json
 import os
+import statistics
 import tempfile
 from pathlib import Path
 
@@ -59,7 +60,7 @@ def current_raw(root=Path("/sys/bus/iio/devices")):
         for device in sorted(root.glob("iio:device*")):
             channel = device / "in_voltage3_raw"
             if channel.exists():
-                return int(channel.read_text().strip())
+                return int(statistics.median(int(channel.read_text().strip()) for _ in range(5)))
     except (OSError, ValueError):
         pass
     return None

@@ -3,15 +3,16 @@
 <title>Settings · {{ page_name }}</title>
 <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='grill-icon.svg') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
-<body><header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>{{ page_name }}</strong><small>Update settings</small></div></header>
+<body><header><img class="logo" src="{{ url_for('static', filename='grill-icon.svg') }}" alt=""><div><strong>{{ page_name }}</strong><small>Settings</small></div></header>
 <main><nav><a href="{{ url_for('index') }}">Dashboard</a><a href="{{ url_for('cooks') }}">Cook Presets</a><a href="{{ url_for('settings') }}" aria-current="page">Settings</a><a href="{{ url_for('notifications') }}">Notifications</a></nav>
-<section class="card"><p class="eyebrow">UPDATE INTERVALS</p><h1>How often to update</h1>
-{% if result == 'saved' %}<p class="banner good" role="status">Update settings saved.</p>{% endif %}
+<section class="card"><h1>Settings</h1>
+{% if result == 'saved' %}<p class="banner good" role="status">Settings saved.</p>{% endif %}
 {% if result == 'invalid' %}<p class="banner bad" role="alert">Enter values within the ranges below.</p>{% endif %}
 <form method="post">
 <input type="hidden" name="csrf" value="{{ csrf }}">
 <label>Page name<input name="page_name" maxlength="60" required value="{{ intervals.page_name }}"></label>
 <p class="note">This name appears in the header and browser tab on every page.</p>
+<p class="eyebrow">UPDATE INTERVALS</p><h2>How often to update</h2>
 <label>Sensor sample interval (10–300 seconds)<input name="sample_seconds" type="number" min="10" max="300" step="1" required value="{{ intervals.sample_seconds }}"></label>
 <p class="note">The collector uses this interval for its next sensor sample.</p>
 <label>Dashboard refresh interval (2–60 seconds)<input name="refresh_seconds" type="number" min="2" max="60" step="1" required value="{{ intervals.refresh_seconds }}"></label>
@@ -25,21 +26,22 @@
 <input name="led_brightness" type="range" min="0" max="100" step="5" value="{{ intervals.led_brightness }}" id="led-brightness-slider"></label>
 <p class="note">Green means Wi-Fi connected, blue means connecting, and red means disconnected. At 0%, the LED is off. Changes apply within a few seconds.</p>
 {% endif %}
-<button name="action" value="save">Save update settings</button>
+<button name="action" value="save">Save settings</button>
 </form></section>
 {% if rgb_led_available %}<script src="{{ url_for('static', filename='led-brightness.js') }}" defer></script>{% endif %}
 <section class="card"><p class="eyebrow">PELLET SENSOR</p><h2>Calibrate hopper level</h2>
-<p class="note">With the hopper empty, refresh this page and use its current sensor reading for Empty. Save it. Fill the hopper, refresh again, use the new reading for Full, then save. You can enter the readings manually too.</p>
-{% if pellet_raw is not none %}<p>Current sensor reading: <strong>{{ pellet_raw }}</strong> raw counts</p>
-{% else %}<p class="banner bad" role="alert">Pellet sensor reading unavailable. Check its wiring before calibrating.</p>{% endif %}
+<p class="note">Start live readings to see the sensor update every second. With the hopper empty, wait for a stable reading, use it for Empty, and save. Fill the hopper, use the live reading for Full, and save. Stop live readings to return to normal sampling. You can enter the readings manually too.</p>
+<p>Current sensor reading: <strong id="pellet-raw">{{ pellet_raw if pellet_raw is not none else 'Unavailable' }}</strong> raw counts · Level: <strong id="pellet-percent">{{ (pellet_percent ~ '%') if pellet_percent is not none else 'Sensor unavailable' }}</strong></p>
+<button type="button" class="secondary" id="pellet-live-toggle" data-url="{{ url_for('api_pellet_sensor') }}" aria-pressed="false">Start live readings</button>
+<span id="pellet-live-status" role="status">Shows the latest reading when this page loaded.</span>
 {% if result == 'calibration_saved' %}<p class="banner good" role="status">Pellet calibration saved. The next sensor sample will use it.</p>{% endif %}
 {% if result == 'calibration_invalid' %}<p class="banner bad" role="alert">Enter readings from 0–32767, at least 500 counts apart.</p>{% endif %}
 <form method="post" action="{{ url_for('save_pellet_calibration') }}">
 <input type="hidden" name="csrf" value="{{ csrf }}">
 <label>Empty hopper reading<input name="empty_raw" id="pellet-empty-raw" type="number" min="0" max="32767" step="1" required value="{{ pellet_calibration.empty_raw }}"></label>
-{% if pellet_raw is not none %}<button type="button" class="secondary pellet-capture" data-target="pellet-empty-raw" data-reading="{{ pellet_raw }}">Use current reading for Empty</button>{% endif %}
+<button type="button" class="secondary pellet-capture" data-target="pellet-empty-raw" data-reading="{{ pellet_raw if pellet_raw is not none else '' }}" {% if pellet_raw is none %}disabled{% endif %}>Use current reading for Empty</button>
 <label>Full hopper reading<input name="full_raw" id="pellet-full-raw" type="number" min="0" max="32767" step="1" required value="{{ pellet_calibration.full_raw }}"></label>
-{% if pellet_raw is not none %}<button type="button" class="secondary pellet-capture" data-target="pellet-full-raw" data-reading="{{ pellet_raw }}">Use current reading for Full</button>{% endif %}
+<button type="button" class="secondary pellet-capture" data-target="pellet-full-raw" data-reading="{{ pellet_raw if pellet_raw is not none else '' }}" {% if pellet_raw is none %}disabled{% endif %}>Use current reading for Full</button>
 <p class="note">Empty and full must be at least 500 counts apart. Fill level can rise or fall as the raw reading changes.</p>
 <button name="action" value="save">Save pellet calibration</button>
 <button name="action" value="reset" formnovalidate>Restore defaults</button>

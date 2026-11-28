@@ -235,6 +235,13 @@ def index():
     return render_template("index.html", reading=latest_reading())
 
 
+@app.route("/api/pellet-sensor")
+def api_pellet_sensor():
+    raw = pellet_calibration.current_raw()
+    level = pellet_calibration.percent(raw) if raw is not None else None
+    return jsonify({"raw": raw, "percent": level})
+
+
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
     if request.method == "POST":
@@ -251,9 +258,11 @@ def settings():
             return redirect(url_for("settings", result="saved"))
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
+    calibration = pellet_calibration.load()
+    raw = pellet_calibration.current_raw()
     return render_template("settings.html", intervals=update_settings.load(),
-                           pellet_calibration=pellet_calibration.load(),
-                           pellet_raw=pellet_calibration.current_raw(),
+                           pellet_calibration=calibration, pellet_raw=raw,
+                           pellet_percent=pellet_calibration.percent(raw, calibration) if raw is not None else None,
                            rgb_led_available=Path("/etc/systemd/system/traeger-led.service").exists(),
                            csrf=csrf_token(), result=request.args.get("result", ""),
                            update=update_manager.status(),
