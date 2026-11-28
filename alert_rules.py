@@ -17,6 +17,9 @@ def evaluate(previous, current, state, settings):
     """Return new state and messages. The caller must only evaluate new samples."""
     state = dict(state)
     messages = []
+    unit = "C" if settings.get("temperature_unit") == "C" else "F"
+    def temp(value):
+        return "{}°{}".format(round((value - 32) * 5 / 9) if unit == "C" else round(value), unit)
     if previous is None:
         return state, messages
 
@@ -42,7 +45,7 @@ def evaluate(previous, current, state, settings):
         if goal and old_goal == goal and value and old_value and old_value < goal <= value and not state.get(name + "_reached"):
             state[name + "_reached"] = True
             if settings.get(name + "_reached"):
-                messages.append("{} reached target: {}°F of {}°F.".format(label, round(value), round(goal)))
+                messages.append("{} reached target: {} of {}.".format(label, temp(value), temp(goal)))
 
     if target and current_grill and state.get("grill_reached") and settings.get("grill_deviation"):
         delta = (current_grill - target) / target * 100
@@ -50,10 +53,10 @@ def evaluate(previous, current, state, settings):
         previous_alert = state.get("grill_deviation")
         new_alert = "high" if delta >= limit else "low" if delta <= -limit else None
         if new_alert and previous_alert != new_alert:
-            messages.append("Grill temperature too {}: {}°F vs {}°F target.".format(new_alert, round(current_grill), round(target)))
+            messages.append("Grill temperature too {}: {} vs {} target.".format(new_alert, temp(current_grill), temp(target)))
             state["grill_deviation"] = new_alert
         elif previous_alert and abs(delta) <= limit * 0.7:
-            messages.append("Grill temperature recovered: {}°F vs {}°F target.".format(round(current_grill), round(target)))
+            messages.append("Grill temperature recovered: {} vs {} target.".format(temp(current_grill), temp(target)))
             state["grill_deviation"] = None
 
     pellets = positive(current, "pellets")
@@ -71,7 +74,7 @@ def evaluate(previous, current, state, settings):
     limit = settings["pi_threshold"]
     if settings.get("pi_hot") and pi_temp and old_pi:
         if old_pi < limit <= pi_temp and not state.get("pi_hot"):
-            messages.append("Grill monitor Pi temperature high: {}°F.".format(round(pi_temp)))
+            messages.append("Grill monitor Pi temperature high: {}.".format(temp(pi_temp)))
             state["pi_hot"] = True
         elif pi_temp < limit - 10:
             state["pi_hot"] = False

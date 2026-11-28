@@ -45,6 +45,7 @@ def tick():
     if saved.get("last_sample") == current["time"]:
         return
     settings = dict(DEFAULTS, **load_json(SETTINGS))
+    settings["temperature_unit"] = app.update_settings.load()["temperature_unit"]
     configured = bool(app.credentials().get("PUSHOVER_APP_TOKEN") and app.credentials().get("PUSHOVER_USER_KEY"))
     prior = saved.get("previous")
     state = saved.get("flags", {})

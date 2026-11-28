@@ -53,7 +53,7 @@
       </div>
       <div class="threshold-grid">
         <label>Low pellets at or below (%)<input name="pellet_threshold" type="number" min="5" max="50" value="{{ settings.pellet_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
-        <label>Pi temperature high (°F)<input name="pi_threshold" type="number" min="120" max="220" value="{{ settings.pi_threshold }}" {% if not secure_form %}disabled{% endif %}></label>
+        <label>Pi temperature high (°{{ temperature_unit }})<input name="pi_threshold" type="number" min="{{ 49 if temperature_unit == 'C' else 120 }}" max="{{ 104 if temperature_unit == 'C' else 220 }}" value="{{ display_temp(settings.pi_threshold) }}" {% if not secure_form %}disabled{% endif %}></label>
         <label>Grill deviation (%)<input name="deviation_percent" type="number" min="5" max="40" value="{{ settings.deviation_percent }}" {% if not secure_form %}disabled{% endif %}></label>
       </div>
       <button name="action" value="save_alerts" {% if not secure_form %}disabled{% endif %}>Save alert settings</button>

@@ -7,6 +7,9 @@ let previousEta = null;
 let showGaugeTicks = false;
 let currentHistory = [];
 let refreshMs = 15000;
+let temperatureUnit = 'F';
+const displayTemperature = value => temperatureUnit === 'C' ? Math.round((value - 32) * 5 / 9) : Math.round(value);
+const fmtTemperature = value => value === null || value === undefined || !Number.isFinite(value) || value <= 0 ? '—' : String(displayTemperature(value));
 let sampleDeadline = null;
 let sampleInterval = 30;
 let sampleState = 'loading';
@@ -70,9 +73,11 @@ function targetMarker(dial, target, max) {
     return [100 + radius * Math.sin(radians), 100 - radius * Math.cos(radians)];
   };
   if (showGaugeTicks) {
-    for (let value = 0; value <= max; value += 10) {
+    const ticks = temperatureUnit === 'C' ?
+      Array.from({length:27}, (_, i) => ({value:i * 10 * 9 / 5 + 32, major:i % 5 === 0})) :
+      Array.from({length:51}, (_, i) => ({value:i * 10, major:i % 5 === 0}));
+    for (const {value, major} of ticks.filter(t => t.value <= max)) {
       const degrees = -135 + (value / max) * 270;
-      const major = value % 50 === 0;
       const inner = point(major ? 80 : 85, degrees);
       const outer = point(major ? 95 : 92, degrees);
       const tick = document.createElementNS(ns, 'line');
@@ -104,8 +109,8 @@ function targetMarker(dial, target, max) {
   svg.appendChild(label);
 }
 function updateDial(name, value, target) {
-  $(name + '-value').textContent = fmt(value);
-  $(name + '-target').textContent = fmt(target);
+  $(name + '-value').textContent = fmtTemperature(value);
+  $(name + '-target').textContent = fmtTemperature(target);
   const dial = document.querySelector('[data-field="' + name + '"] .dial');
   const amount = value && value > 0 ? Math.min(value / 500, 1) : 0;
   animateDial(dial, amount);
@@ -152,7 +157,7 @@ function chart(rows, animate = true) {
     const py = y(value);
     add('line', {x1: 45, y1: py, x2: 750, y2: py, stroke: '#3d454c', 'stroke-width': 1});
     const label = add('text', {x: 36, y: py + 4, 'text-anchor': 'end', fill: '#98a4ab', 'font-size': 12});
-    label.textContent = temperatures.length ? value : '';
+    label.textContent = temperatures.length ? displayTemperature(value) : '';
   }
   const first = new Date(rows[0].time).getTime();
   const last = new Date(rows[rows.length - 1].time).getTime();
@@ -184,7 +189,7 @@ function chart(rows, animate = true) {
           const nearest = samples.reduce((best, row) => Math.abs(x(row)-plotX) < Math.abs(x(best)-plotX) ? row : best);
           const titles = {grill:'Grill', probe1:'Probe 1', probe2:'Probe 2', pellets:'Pellets'};
           const tip = $('chart-tooltip');
-          tip.textContent = titles[field] + ': ' + (field === 'pellets' ? Math.round(nearest[field]) + '%' : Math.round(nearest[field]) + '°F') +
+          tip.textContent = titles[field] + ': ' + (field === 'pellets' ? Math.round(nearest[field]) + '%' : displayTemperature(nearest[field]) + '°' + temperatureUnit) +
             ' · ' + new Date(nearest.time).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
           const card = tip.parentElement;
           const bounds = card.getBoundingClientRect();
@@ -211,19 +216,22 @@ async function refresh() {
     const data = await response.json();
     updateSampleCountdown(data);
     refreshMs = Math.max(2000, Math.min(60000, (data.refresh_seconds || 15) * 1000));
+    temperatureUnit = data.temperature_unit === 'C' ? 'C' : 'F';
+    document.querySelectorAll('.dial-reading small, .dial-card .target-unit').forEach(node => { node.textContent = '°' + temperatureUnit; });
+    $('chart-unit').textContent = '°' + temperatureUnit;
     $('live-status').textContent = data.stale ? 'Readings delayed' : 'Live';
     $('live-status').classList.toggle('stale', data.stale);
     $('wifi-name').textContent = data.wifi_name || 'Not connected';
     const cook = data.active_cook;
     $('cook-name').textContent = cook ? cook.name : 'No cook preset active';
-    $('cook-targets').textContent = cook ? 'Grill ' + cook.grill + '°F' +
-      (cook.probe1 ? ' · Probe 1 ' + cook.probe1 + '°F' : '') +
-      (cook.probe2 ? ' · Probe 2 ' + cook.probe2 + '°F' : '') :
+    $('cook-targets').textContent = cook ? 'Grill ' + displayTemperature(cook.grill) + '°' + temperatureUnit +
+      (cook.probe1 ? ' · Probe 1 ' + displayTemperature(cook.probe1) + '°' + temperatureUnit : '') +
+      (cook.probe2 ? ' · Probe 2 ' + displayTemperature(cook.probe2) + '°' + temperatureUnit : '') :
       'Choose a saved cook to set its temperature targets.';
     if (!data.latest) { $('sample-time').textContent = 'Waiting for the collector'; return; }
     const r = data.latest;
     $('sample-time').textContent = 'Last sample: ' + new Date(r.time).toLocaleString();
-    const cookSignature = (cook ? [cook.name,cook.grill,cook.probe1,cook.probe2].join('|') : '') + '|' + (data.session_start || '');
+    const cookSignature = (cook ? [cook.name,cook.grill,cook.probe1,cook.probe2].join('|') : '') + '|' + (data.session_start || '') + '|' + temperatureUnit;
     showGaugeTicks = data.gauge_ticks === true;
     const etaSignature = JSON.stringify([data.show_eta, data.eta, data.stale]);
     if (r.time === previousSample && cookSignature === previousCook &&
@@ -239,7 +247,7 @@ async function refresh() {
     $('pellets').textContent = r.pellets === null ? 'Sensor unavailable' : Math.round(r.pellets) + '%';
     $('pellet-fill').style.width = Math.max(0, Math.min(100, r.pellets || 0)) + '%';
     $('wifi').textContent = r.wifi || '—';
-    $('pi-temp').textContent = fmt(r.pi_temp) + '°F';
+    $('pi-temp').textContent = fmtTemperature(r.pi_temp) + '°' + temperatureUnit;
     currentHistory = data.history;
     chart(currentHistory);
   } catch (_) {

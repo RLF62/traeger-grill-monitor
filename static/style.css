@@ -144,3 +144,5 @@ button.pellet-color-button:hover .meter, button.pellet-color-button:focus-visibl
 
 .dial-center .dial-reading { display:flex; align-items:baseline; justify-content:center; gap:3px; white-space:nowrap; color:#f5f3ed; font-size:inherit; }
 .dial-center .dial-reading small { font-size:.72rem; }
+
+select { display:block; width:min(100%,480px); padding:11px; border-radius:8px; border:1px solid #74808a; background:#12181d; color:white; font:inherit; }

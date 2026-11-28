@@ -15,12 +15,12 @@
   <p class="note">Save your grill and probe temperatures once. Activate a cook to use its targets in both dashboards.</p>
   {% if result == 'saved' %}<p class="banner good" role="status">Cook presets updated.</p>{% endif %}
   {% if result == 'error' %}<p class="banner bad" role="alert">{{ reason }}</p>{% endif %}
-  {% if active %}<p class="active-summary">Now cooking: <strong>{{ active.name }}</strong> · Grill {{ active.grill }}°F{% if active.probe1 %} · Probe 1 {{ active.probe1 }}°F{% endif %}{% if active.probe2 %} · Probe 2 {{ active.probe2 }}°F{% endif %}</p>{% endif %}
+  {% if active %}<p class="active-summary">Now cooking: <strong>{{ active.name }}</strong> · Grill {{ display_temp(active.grill) }}°{{ temperature_unit }}{% if active.probe1 %} · Probe 1 {{ display_temp(active.probe1) }}°{{ temperature_unit }}{% endif %}{% if active.probe2 %} · Probe 2 {{ display_temp(active.probe2) }}°{{ temperature_unit }}{% endif %}</p>{% endif %}
   <div class="preset-list">
   {% for row in rows %}
     <article class="preset {% if row.active %}selected{% endif %}">
       <div class="preset-main">
-        <div><strong>{{ row.name }}</strong><p>Grill {{ row.grill }}°F{% if row.probe1 %} · Probe 1 {{ row.probe1 }}°F{% endif %}{% if row.probe2 %} · Probe 2 {{ row.probe2 }}°F{% endif %}</p></div>
+        <div><strong>{{ row.name }}</strong><p>Grill {{ display_temp(row.grill) }}°{{ temperature_unit }}{% if row.probe1 %} · Probe 1 {{ display_temp(row.probe1) }}°{{ temperature_unit }}{% endif %}{% if row.probe2 %} · Probe 2 {{ display_temp(row.probe2) }}°{{ temperature_unit }}{% endif %}</p></div>
         {% if row.active %}
           <div class="active-actions"><span class="active-pill">Active</span><form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="index" value="{{ row.index }}"><button class="secondary" name="action" value="activate">Restart cook &amp; chart</button></form></div>
         {% else %}
@@ -31,7 +31,7 @@
         <form method="post" class="preset-form">
           <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="index" value="{{ row.index }}">
           <label>Cook name<input name="name" maxlength="60" required value="{{ row.name }}"></label>
-          <div class="preset-fields"><label>Grill target °F<input name="grill" type="number" min="50" max="500" required value="{{ row.grill }}"></label><label>Probe 1 target °F<input name="probe1" type="number" min="50" max="500" value="{{ row.probe1 or '' }}"></label><label>Probe 2 target °F<input name="probe2" type="number" min="50" max="500" value="{{ row.probe2 or '' }}"></label></div>
+          <div class="preset-fields"><label>Grill target °{{ temperature_unit }}<input name="grill" type="number" min="{{ 10 if temperature_unit == 'C' else 50 }}" max="{{ 260 if temperature_unit == 'C' else 500 }}" required value="{{ display_temp(row.grill) if row.grill else '' }}"></label><label>Probe 1 target °{{ temperature_unit }}<input name="probe1" type="number" min="{{ 10 if temperature_unit == 'C' else 50 }}" max="{{ 260 if temperature_unit == 'C' else 500 }}" value="{{ display_temp(row.probe1) if row.probe1 else '' }}"></label><label>Probe 2 target °{{ temperature_unit }}<input name="probe2" type="number" min="{{ 10 if temperature_unit == 'C' else 50 }}" max="{{ 260 if temperature_unit == 'C' else 500 }}" value="{{ display_temp(row.probe2) if row.probe2 else '' }}"></label></div>
           <button name="action" value="edit">Save changes</button>
           <button class="secondary" name="action" value="delete" formnovalidate data-confirm-remove>Remove preset</button>
         </form>
@@ -46,7 +46,7 @@
   <form method="post" class="preset-form">
     <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="version" value="{{ version }}">
     <label>Cook name<input name="name" maxlength="60" required placeholder="e.g. Brisket in foil"></label>
-    <div class="preset-fields"><label>Grill target °F<input name="grill" type="number" min="50" max="500" required placeholder="225"></label><label>Probe 1 target °F<input name="probe1" type="number" min="50" max="500" placeholder="Optional"></label><label>Probe 2 target °F<input name="probe2" type="number" min="50" max="500" placeholder="Optional"></label></div>
+    <div class="preset-fields"><label>Grill target °{{ temperature_unit }}<input name="grill" type="number" min="{{ 10 if temperature_unit == 'C' else 50 }}" max="{{ 260 if temperature_unit == 'C' else 500 }}" required placeholder="{{ 107 if temperature_unit == 'C' else 225 }}"></label><label>Probe 1 target °{{ temperature_unit }}<input name="probe1" type="number" min="{{ 10 if temperature_unit == 'C' else 50 }}" max="{{ 260 if temperature_unit == 'C' else 500 }}" placeholder="Optional"></label><label>Probe 2 target °{{ temperature_unit }}<input name="probe2" type="number" min="{{ 10 if temperature_unit == 'C' else 50 }}" max="{{ 260 if temperature_unit == 'C' else 500 }}" placeholder="Optional"></label></div>
     <button name="action" value="add">Save new preset</button>
   </form>
 </section>

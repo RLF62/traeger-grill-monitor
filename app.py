@@ -46,7 +46,13 @@ app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Strict"
 
 @app.context_processor
 def page_branding():
-    return {"page_name": update_settings.load()["page_name"]}
+    unit = update_settings.load()["temperature_unit"]
+    def display_temp(value):
+        if value is None:
+            return ""
+        return round((value - 32) * 5 / 9) if unit == "C" else value
+    return {"page_name": update_settings.load()["page_name"], "temperature_unit": unit,
+            "display_temp": display_temp}
 
 
 def credentials():
@@ -230,6 +236,7 @@ def api_readings():
                     "active_cook": active, "session_start": cook_session["started_at"] if cook_session else None,
                     "refresh_seconds": settings_data["refresh_seconds"],
                     "sample_seconds": sample_seconds, "next_sample_in": next_sample_in,
+                    "temperature_unit": settings_data["temperature_unit"],
                     "gauge_ticks": settings_data["gauge_ticks"],
                     "show_eta": settings_data["show_eta"], "eta": eta})
 
@@ -258,7 +265,8 @@ def settings():
                                  request.form.get("gauge_ticks") == "on",
                                  request.form.get("show_eta") == "on",
                                  request.form.get("page_name", ""),
-                                 request.form.get("led_brightness", update_settings.load()["led_brightness"]))
+                                 request.form.get("led_brightness", update_settings.load()["led_brightness"]),
+                                 request.form.get("temperature_unit", "F"))
             return redirect(url_for("settings", result="saved"))
         except (ValueError, TypeError):
             return redirect(url_for("settings", result="invalid"))
@@ -321,9 +329,14 @@ def cooks():
         action = request.form.get("action", "")
         try:
             index = int(request.form["index"]) if action not in ("add",) else None
+            def stored_temp(field):
+                value = request.form.get(field, "")
+                if update_settings.load()["temperature_unit"] == "C" and str(value).strip():
+                    return round(int(value) * 9 / 5 + 32)
+                return value
             preset = (cook_presets.validate(request.form.get("name", ""),
-                      request.form.get("grill", ""), request.form.get("probe1", ""),
-                      request.form.get("probe2", "")) if action in ("add", "edit") else None)
+                      stored_temp("grill"), stored_temp("probe1"),
+                      stored_temp("probe2")) if action in ("add", "edit") else None)
             before = cook_presets.active_cook()
             cook_presets.change(action, request.form.get("version", ""),
                                 index=index, preset=preset)
@@ -361,9 +374,12 @@ def notifications():
             if request.form.get("enabled") and not configured:
                 return redirect(url_for("notifications", result="missing"))
             try:
+                pi_threshold = int(request.form["pi_threshold"])
+                if update_settings.load()["temperature_unit"] == "C":
+                    pi_threshold = round(pi_threshold * 9 / 5 + 32)
                 thresholds = {
                     "pellet_threshold": int(request.form["pellet_threshold"]),
-                    "pi_threshold": int(request.form["pi_threshold"]),
+                    "pi_threshold": pi_threshold,
                     "deviation_percent": int(request.form["deviation_percent"]),
                 }
             except (ValueError, KeyError):
