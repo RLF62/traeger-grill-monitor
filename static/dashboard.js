@@ -7,6 +7,34 @@ let previousEta = null;
 let showGaugeTicks = false;
 let currentHistory = [];
 let refreshMs = 15000;
+let sampleDeadline = null;
+let sampleInterval = 30;
+let sampleState = 'loading';
+function renderSampleCountdown() {
+  const text = $('next-sample-text');
+  const progress = $('next-sample-progress');
+  if (sampleState !== 'ready') {
+    text.textContent = sampleState === 'offline' ? 'Next reading unavailable' :
+      sampleState === 'first' ? 'Waiting for first reading…' : 'Checking next reading…';
+    progress.value = 0;
+    return;
+  }
+  const remaining = Math.max(0, (sampleDeadline - performance.now()) / 1000);
+  progress.value = Math.min(100, Math.max(0, remaining / sampleInterval * 100));
+  text.textContent = remaining > 0 ? 'Next reading in ~' + Math.ceil(remaining) + 's' :
+    'Waiting for next reading…';
+}
+function updateSampleCountdown(data) {
+  sampleInterval = Math.max(1, Number(data.sample_seconds) || 30);
+  if (!data.latest || data.next_sample_in === null || data.next_sample_in === undefined) {
+    sampleState = 'first';
+  } else {
+    sampleState = 'ready';
+    sampleDeadline = performance.now() + Math.max(0, Number(data.next_sample_in) || 0) * 1000;
+  }
+  renderSampleCountdown();
+}
+setInterval(renderSampleCountdown, 1000);
 const colors = {grill:'#ffad48', probe1:'#69c9c0', probe2:'#9da8ff', pellets:'#a4dc74'};
 const visible = {grill:true, probe1:true, probe2:true, pellets:true};
 const dialAnimations = new WeakMap();
@@ -181,6 +209,7 @@ async function refresh() {
     const response = await fetch('api/readings', {cache:'no-store'});
     if (!response.ok) throw new Error('Readings unavailable');
     const data = await response.json();
+    updateSampleCountdown(data);
     refreshMs = Math.max(2000, Math.min(60000, (data.refresh_seconds || 15) * 1000));
     $('live-status').textContent = data.stale ? 'Readings delayed' : 'Live';
     $('live-status').classList.toggle('stale', data.stale);
@@ -214,6 +243,8 @@ async function refresh() {
     currentHistory = data.history;
     chart(currentHistory);
   } catch (_) {
+    sampleState = 'offline';
+    renderSampleCountdown();
     $('live-status').textContent = 'Connection lost';
     $('live-status').classList.add('stale');
   } finally {

@@ -133,3 +133,11 @@ button.pellet-color-button:hover .meter, button.pellet-color-button:focus-visibl
 
 .dial-card .eta { margin:6px 0 0; color:#a9d8a2; font-size:.88rem; min-height:1.3em; }
 .dial-card .eta[hidden] { display:none; }
+
+.sample-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px 22px; margin:10px 0 0; }
+.sample-row .stamp { margin:0; }
+.sample-countdown { display:flex; align-items:center; gap:10px; color:#b6bec6; font-size:.88rem; }
+.sample-countdown progress { width:110px; height:8px; appearance:none; border:0; border-radius:99px; background:#38434c; overflow:hidden; }
+.sample-countdown progress::-webkit-progress-bar { background:#38434c; border-radius:99px; }
+.sample-countdown progress::-webkit-progress-value { background:#ffad48; border-radius:99px; }
+.sample-countdown progress::-moz-progress-bar { background:#ffad48; border-radius:99px; }

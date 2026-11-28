@@ -218,6 +218,9 @@ def api_readings():
     stale = not latest or datetime.now() - datetime.fromisoformat(latest["time"]) > timedelta(minutes=3)
     settings_data = update_settings.load()
     eta = estimate(history, active, stale) if active and settings_data["show_eta"] else {}
+    sample_seconds = settings_data["sample_seconds"]
+    elapsed = max(0, (datetime.now() - datetime.fromisoformat(latest["time"])).total_seconds()) if latest else None
+    next_sample_in = max(0, sample_seconds - elapsed) if elapsed is not None else None
     if len(history) > 400:
         step = (len(history) + 398) // 399
         history = history[::step]
@@ -226,6 +229,7 @@ def api_readings():
     return jsonify({"latest": latest, "history": history, "stale": stale, "wifi_name": wifi_name(),
                     "active_cook": active, "session_start": cook_session["started_at"] if cook_session else None,
                     "refresh_seconds": settings_data["refresh_seconds"],
+                    "sample_seconds": sample_seconds, "next_sample_in": next_sample_in,
                     "gauge_ticks": settings_data["gauge_ticks"],
                     "show_eta": settings_data["show_eta"], "eta": eta})
 

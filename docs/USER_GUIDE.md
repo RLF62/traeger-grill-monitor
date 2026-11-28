@@ -6,7 +6,7 @@
 
 ![Dashboard with live gauges, target marks and chart](images/dashboard.png)
 
-The dashboard shows the grill, two probes, pellet hopper, Pi temperature and Wi-Fi signal with its network name. A missing probe is shown as unavailable. Target marks on gauge rings show where saved temperature goals fall on the scale; they do not set the grill thermostat.
+The dashboard shows the grill, two probes, pellet hopper, Pi temperature and Wi-Fi signal with its network name. Beside **Last sample**, a bar shrinks from right to left as it counts down to the next expected sensor reading. It shows “Waiting for next reading” if the collector is late; the countdown restarts when a new reading arrives. The dashboard refresh interval controls how quickly it can notice that reading. A missing probe is shown as unavailable. Target marks on gauge rings show where saved temperature goals fall on the scale; they do not set the grill thermostat.
 
 - Click a gauge ring to change its color and the matching chart trace. Click the colored line in the pellet hopper box to change its trace color.
 - Hover a chart line, or tap near it, for the time, sensor name and value. Click a legend item to hide or show that trace. Pellet level has its own percentage scale.

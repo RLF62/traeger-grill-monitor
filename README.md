@@ -1,6 +1,6 @@
 # Traeger Grill Monitor
 
-A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and probe temperatures, pellet level, Wi-Fi status, history, saved cook presets and Pushover alerts. **The monitor reads sensors; it does not control the grill.**
+A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and probe temperatures, a countdown beside the last sample for the next sensor reading, pellet level, Wi-Fi status, history, saved cook presets and Pushover alerts. **The monitor reads sensors; it does not control the grill.**
 
 ## Try the interactive demo
 
@@ -38,7 +38,7 @@ Open the URL printed at the end. Reboot first if the installer enables the ADC o
 
 | Page | Features |
 | --- | --- |
-| Dashboard | Gauges with target marks and optional time-to-target estimates, Wi-Fi name, pellet level, matching trace colors, hover values and clickable legend. |
+| Dashboard | Gauges with target marks and optional time-to-target estimates, a next-reading countdown beside the last sample, Wi-Fi name, pellet level, matching trace colors, hover values and clickable legend. |
 | Cook Presets | Save targets, activate a cook and start a fresh chart session without deleting old readings. |
 | Notifications | Configure Pushover keys and individual alerts. |
 | Settings | Change the page name, set sensor and browser update intervals, toggle gauge tick marks and time-to-target estimates, adjust an optional RGB status LED, calibrate empty and full hopper readings, and check GitHub for software updates. |
