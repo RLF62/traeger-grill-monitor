@@ -109,11 +109,12 @@ def install():
             return
         previous = git("rev-parse", "HEAD", user=owner)
         git("merge", "--ff-only", "origin/main", user=owner)
-        python = BASE / ".venv" / "bin" / "python"
-        if not python.exists():
-            raise UpdateError("Python environment missing; use the installation guide.")
-        command([str(python), "-m", "pip", "install", "-r", str(BASE / "requirements.txt")],
-                user=owner, timeout=180)
+        if git("diff", "--name-only", previous, "HEAD", "--", "requirements.txt", user=owner):
+            python = BASE / ".venv" / "bin" / "python"
+            if not python.exists():
+                raise UpdateError("Python requirements changed on a legacy install. Update dependencies manually before installing this release.")
+            command([str(python), "-m", "pip", "install", "-r", str(BASE / "requirements.txt")],
+                    user=owner, timeout=180)
         for service in SERVICES:
             command(["systemctl", "restart", service], timeout=25)
         for service in SERVICES:
