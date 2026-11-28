@@ -34,6 +34,23 @@ class CookNotificationTests(unittest.TestCase):
             app.notify_cook_started({"name": "Ham"})
             send.assert_not_called()
 
+    def test_enabled_start_sends_and_records_delivery(self):
+        import app
+        reading = {"time": datetime.now().isoformat(), "grill": 225, "pellets": 70, "wifi": "-60 dBm"}
+        with patch.object(app, "alert_settings", return_value={"enabled": True, "new_cook": True,
+                                                                "snooze_until": None}), \
+             patch.object(app, "credentials", return_value={"PUSHOVER_APP_TOKEN": "token", "PUSHOVER_USER_KEY": "key"}), \
+             patch.object(app, "recent_readings", return_value=[reading]), \
+             patch.object(app, "send_message", return_value=True) as send, \
+             patch.object(app.alert_delivery, "record") as record:
+            app.notify_cook_started({"name": "Ham"})
+            message = send.call_args.args[0]
+            self.assertIn("Now cooking: Ham", message)
+            self.assertIn("Grill 225°F", message)
+            self.assertIn("Pellets 70%", message)
+            self.assertIn("Wi-Fi -60 dBm", message)
+            record.assert_called_once_with(message, True)
+
 
 if __name__ == "__main__":
     unittest.main()
