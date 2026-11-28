@@ -6,11 +6,13 @@ A Raspberry Pi dashboard for a sensor-equipped Traeger grill. It shows grill and
 
 [Open the simulated Traeger Grill Monitor](https://rlf62.github.io/traeger-grill-monitor/demo/). It runs with sample readings in your browser. Try the cook presets, gauge tick marks, and estimated time-to-target controls without connecting to a grill or sending alerts.
 
+## Settings
+
+Open **Settings** to change the page name shown in every header and browser tab, adjust the sensor sampling and dashboard refresh intervals, and switch gauge tick marks or time-to-target estimates on or off. The **Update from GitHub** section shows installed and available release versions. Choose **Check for updates**, then **Install update** when a new release is available. The dashboard may briefly disconnect while services restart; saved cooks, readings, and preferences remain in place.
+
 ## Estimated time to target
 
-On your Pi, open **Settings** and use **Show estimated time to target** to turn predictions on or off:
-
-![Settings page showing the estimated time to target on/off checkbox](docs/images/settings-time-to-target.png)
+Turn on **Show estimated time to target** in Settings to display predictions beneath the gauges.
 
 A recorded warmup example shows an estimate beneath the Grill gauge. It recalculates with each new sensor sample, so the predicted time can change. A probe with no useful rising trend shows “calculating” until enough readings arrive.
 
@@ -46,7 +48,7 @@ Runtime files in `data/`, credentials and settings in `private/`, and the old ro
 
 ## Software updates
 
-Open **Settings  Update from GitHub** and select **Check for updates**. The page shows the installed and available release versions. Select **Install update** when one is available. The updater accepts only a clean fast-forward from this repository's `main` branch. It installs Python requirements when they change, restarts the three monitor services, and reports the result on the page. If installation fails after the code changes, it restores the previous commit and restarts the services. Readings, cook presets, credentials and preferences are stored outside Git and remain in place.
+Open **Settings → Update from GitHub** and select **Check for updates**. The page shows the installed and available release versions. Select **Install update** when one is available. The updater accepts only a clean fast-forward from this repository's `main` branch. It installs Python requirements when they change, restarts the three monitor services, and reports the result on the page. If installation fails after the code changes, it restores the previous commit and restarts the services. Readings, cook presets, credentials and preferences are stored outside Git and remain in place.
 
 An existing installation made before this feature needs one setup step from its checkout: `sudo bash deploy/install-updater.sh`. A fresh installation includes that step. If a local tracked file was edited, the update is blocked so those changes can be reviewed first.
 The original .248 installation uses system Python rather than the fresh installer's virtual environment. Code updates work there; if a future release changes Python requirements, the updater stops and restores the previous code so dependencies can be updated manually.
